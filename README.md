@@ -12,7 +12,7 @@ ROS 기반 Audio 입출력 Interface
 
 ### 2.1 Requirements
 
--	Ubuntu 14.04 or ~~Ubuntu 16.04~~
+-	Ubuntu 14.04 or Ubuntu 16.04
 -	[ROS](http://wiki.ros.org/) - Robot Operating System.
 -	Many python package(requirements.txt에 기재)
 ```
