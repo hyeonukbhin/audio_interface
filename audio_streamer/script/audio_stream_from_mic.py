@@ -21,7 +21,7 @@ def main():
         CHUNK = int(RATE / LOOP_RATE)  # 100ms
 
     else:
-        INPUT_DEVICE = 7
+        INPUT_DEVICE = 3
         CHANNELS = 1
         RATE = 44100
         LOOP_RATE = 20
@@ -56,6 +56,7 @@ def main():
             byte_buff = stream.read(CHUNK)
             int16_buff = map(ord, byte_buff)
             scan_pub.publish(int16_buff)
+            # print int16_buff
         # print len(int16_buff)
         except IOError, e:
             if e[1] == pyaudio.paInputOverflowed:
