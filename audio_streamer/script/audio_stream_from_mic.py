@@ -24,7 +24,7 @@ def main():
         INPUT_DEVICE = 3
         CHANNELS = 1
         RATE = 44100
-        LOOP_RATE = 20
+        LOOP_RATE = 10
         CHUNK = int(RATE / LOOP_RATE)  # 100ms
 
     audio_interface = pyaudio.PyAudio()
@@ -54,10 +54,13 @@ def main():
 
         try:
             byte_buff = stream.read(CHUNK)
+            print(byte_buff)
             int16_buff = map(ord, byte_buff)
             scan_pub.publish(int16_buff)
+            # print type(int16_buff)
             # print int16_buff
-        # print len(int16_buff)
+            print int16_buff[:20]
+            # print len(int16_buff)
         except IOError, e:
             if e[1] == pyaudio.paInputOverflowed:
                 print e

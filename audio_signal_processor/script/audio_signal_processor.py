@@ -12,6 +12,7 @@ import parselmouth
 import numpy as np
 import pandas as pd
 # import parselmouth
+# buff = []
 
 
 def main():
@@ -25,8 +26,26 @@ def main():
 
 def packetCallback(packetData, buff):
     global callerSpeech, idx, callerArray, frameIdx, endFlag, lastFrameIdx
+    callerSpeech = packetData.data
+    byte_str = makeByteStr(callerSpeech)
+    # print(byte_str)
+    buff.put(byte_str)
+    print([buff.get()])
 
-    snd = parselmouth.Sound("docs/examples/audio/the_north_wind_and_the_sun.wav")
+
+    # list1 = [10, 1, 246, 0, 235, 0, 6, 1, 32, 1, 36, 1, 39, 1, 47, 1, 20, 1, 5, 1]
+    # list2 = [235, 255, 57, 0, 153, 0, 219, 0, 3, 1, 221, 0, 154, 0, 157, 0, 210, 0, 35, 1]
+    # list3 = [105, 1, 112, 1, 126, 1, 123, 1, 64, 1, 250, 0, 199, 0, 178, 0, 162, 0, 114, 0]
+    # list4 = [46, 0, 36, 0, 46, 0, 44, 0, 36, 0, 50, 0, 23, 0, 250, 255, 213, 255, 218]
+    # snd = parselmouth.Sound("docs/examples/audio/the_north_wind_and_the_sun.wav")
+    # snd = parselmouth.Sound()
+    #
+    #
+    #
+    # 1.
+    # __init__(self: parselmouth.Sound, values: numpy.ndarray[float64], sampling_frequency: Positive[
+    #     float] = 44100.0, start_time: float = 0.0) -> None
+
     # plt.figure()
     # plt.plot(snd.xs(), snd.values.T)
     # plt.xlim([snd.xmin, snd.xmax])
@@ -43,6 +62,12 @@ def packetCallback(packetData, buff):
 #    callerSpeech = packetData.data
 #    byte_str = makeByteStr(callerSpeech)
 #    buff.put(byte_str)
+
+def makeByteStr(int16Array):
+
+    byte_str = "".join(map(chr, int16Array))
+    return byte_str
+
 
 if __name__ == '__main__':
     main()
