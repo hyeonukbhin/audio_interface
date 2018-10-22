@@ -21,7 +21,7 @@ def main():
         CHUNK = int(RATE / LOOP_RATE)  # 100ms
 
     else:
-        INPUT_DEVICE = 3
+        INPUT_DEVICE = 5
         CHANNELS = 1
         RATE = 44100
         LOOP_RATE = 10
