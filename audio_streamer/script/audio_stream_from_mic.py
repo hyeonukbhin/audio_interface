@@ -10,7 +10,10 @@ def main():
     rospy.init_node('audio_streamer')
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=50)
 
-    ##### Initial Setting #####
+    '''
+    Initial Setting for Py audio interface
+    '''
+
     FORMAT = pyaudio.paInt16
     audio_interface = pyaudio.PyAudio()
     info = audio_interface.get_host_api_info_by_index(0)
@@ -25,6 +28,7 @@ def main():
             if "USB Audio Device" in name:
                 device_index = i
                 device_name = name
+
 
     if rospy.has_param('~DEVICE_INDEX'):
         INPUT_DEVICE = rospy.get_param('~DEVICE_INDEX')
