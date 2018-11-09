@@ -5,7 +5,6 @@ import pyaudio
 import rospy
 from audio_msgs.msg import AudioData
 
-
 def main():
     rospy.init_node('audio_streamer')
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=50)
@@ -28,7 +27,6 @@ def main():
             if "USB Audio Device" in name:
                 device_index = i
                 device_name = name
-
 
     if rospy.has_param('~DEVICE_INDEX'):
         INPUT_DEVICE = rospy.get_param('~DEVICE_INDEX')
@@ -54,6 +52,7 @@ def main():
     print INPUT_DEVICE_INFO
 
     count = 0
+
     while not rospy.is_shutdown():
 
         current_time2 = rospy.get_rostime()
@@ -67,8 +66,8 @@ def main():
             byte_buff = stream.read(CHUNK)
             int16_buff = map(ord, byte_buff)
             scan_pub.publish(int16_buff)
-            print(byte_buff[:20])
-            print(int16_buff[:20])
+            # print(byte_buff[:20])
+            # print(int16_buff[:20])
         except IOError, e:
             print("\x1b[1;31m[Error Massage] : %s\x1b[1;m" % e)
             stream.close()
@@ -77,7 +76,8 @@ def main():
         r.sleep()
 
 
-def make_stream(audio_interface, format, input_device_index, channels, rate, frames_per_buffer, input=True, output=True):
+def make_stream(audio_interface, format, input_device_index, channels, rate, frames_per_buffer, input=True,
+                output=True):
     stream = audio_interface.open(format=format,
                                   input_device_index=input_device_index,
                                   channels=channels,
