@@ -6,36 +6,31 @@ import numpy as np
 import parselmouth
 import rospy
 from audio_msgs.msg import AudioData, FeatureData
-from six.moves import queue
 from std_msgs.msg import String
 import sounddevice as sd
-import json
-import Queue
 
 
-test = 0
+class testNode:
+    # Calibration pair distance parameter
+    def __init__(self):
+        rospy.init_node("KIST_test_node", anonymous=False)
+        rospy.Subscriber("input_dummy_json", String, self.callback_packet, queue_size=50)
+        self.pub = rospy.Publisher("test_output", FeatureData, queue_size=50)
 
-print(test % 5)
+        self.wav_array = np.array([])
+        self.voice_feature = FeatureData()
+        rospy.spin()
 
-que = queue.Queue(100)
-print(que)
-que2 = Queue.Queue(100)
-print(que2)
+    def callback_packet(self, topic):
+        data = topic.data
+        self.set_param("parameter/robot_speech", data)
 
-
-que2.put([1,2,3,4])
-que2.put([2])
-que2.put(3)
-print(que2.get())
-print(que2.qsize())
-print(que2.get())
-print(que2.qsize())
-print(que2.get())
-print(que2.qsize())
-print(que2.get())
-
-# print("ttt", que.get())
+    def set_param(self, input_key="parameter/name", input_value="유정"):
+        rospy.set_param(input_key, input_value)
 
 
-# print(que)
-
+if __name__ == '__main__':
+    try:
+        testNode()
+    except rospy.ROSInterruptException:
+        pass

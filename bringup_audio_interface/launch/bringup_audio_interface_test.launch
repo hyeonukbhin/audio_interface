@@ -17,8 +17,6 @@
 	</node>
     <node name="KIST_stt_converter" pkg="speech_to_text_converter" type="stt_converter.py" output="screen">
 	</node>
-    <node name="KIST_personality_recognizer" pkg="personality_recognizer" type="personality_recognizer.py" output="screen">
-	</node>
 </launch>
 
 

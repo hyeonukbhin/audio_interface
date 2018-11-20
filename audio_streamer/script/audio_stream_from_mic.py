@@ -77,7 +77,7 @@ def main():
             # print(byte_buff[:20])
             # print(int16_buff[:20])
         except IOError, e:
-            print("\x1b[1;31m[Error Massage] : %s\x1b[1;m" % e)
+            # print("\x1b[1;31m[Error Massage] : %s\x1b[1;m" % e)
             stream.close()
             stream = make_stream(audio_interface, format, INPUT_DEVICE, CHANNELS, RATE, CHUNK)
 
