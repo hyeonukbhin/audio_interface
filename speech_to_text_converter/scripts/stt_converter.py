@@ -127,8 +127,8 @@ def packetCallback(packetData, buff):
     global callerSpeech, idx, callerArray, frameIdx, endFlag, lastFrameIdx
     callerSpeech = packetData.data
     # print len(callerSpeech)
-    robot_speech = get_param("parameter/robot_speech")
-    if robot_speech != "1":
+    robot_speech = get_param("perception/robot_speech")
+    if robot_speech != "ON":
         # print(robot_speech)
         byte_str = makeByteStr(callerSpeech)
         buff.put(byte_str)
