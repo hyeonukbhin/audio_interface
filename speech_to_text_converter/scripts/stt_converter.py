@@ -19,11 +19,15 @@ import pyaudio
 from six.moves import queue
 import os
 import sounddevice as sd
+import rospkg
 
-sd.default.device
+pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
+service_key_path = pack_path + "/scripts/service_key.json"
+
+# sd.default.device
 # sd.default.samplerate = 16000
 os.environ[
-    "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/kist/catkin_ws/src/human_cozmo_interaction/stt/stt_converter/script/service_key.json"
+    "GOOGLE_APPLICATION_CREDENTIALS"] = service_key_path
 
 CHANNELS = 1
 RATE = 44100
