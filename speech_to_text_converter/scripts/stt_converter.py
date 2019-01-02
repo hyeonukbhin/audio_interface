@@ -215,8 +215,10 @@ def listen_print_loop(recognize_stream):
         overwrite_chars = ' ' * max(0, num_chars_printed - len(transcript))
 
         if not result.is_final:
-            sys.stdout.write(transcript + overwrite_chars + '\r')
-            sys.stdout.flush()
+            # sys.stdout.write(transcript + overwrite_chars + '\r')
+            # sys.stdout.flush()
+            rospy.set_param("perception/human_speech", "ON")
+
             num_chars_printed = len(transcript)
 
         else:
@@ -249,6 +251,8 @@ def callbackFromGoogle(recognitionWord):
             "speech": "%s" % inputString
         }
     }
+
+    rospy.set_param("perception/human_speech", "OFF")
 
     jsonString = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
     pub.publish(jsonString)
@@ -296,6 +300,7 @@ def sttConverter():
             recognize_stream.cancel()
         except grpc.RpcError as e:
             code = e.code()
+            print("tttt")
             # CANCELLED is caused by the interrupt handler, which is expected.
             if code is not code.CANCELLED:
                 raise
@@ -314,4 +319,4 @@ if __name__ == '__main__':
         try:
             sttConverter()
         except Exception as e:
-            print(e)
+            print("")
