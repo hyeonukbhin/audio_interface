@@ -128,7 +128,7 @@ def packetCallback(packetData, buff):
     callerSpeech = packetData.data
     # print len(callerSpeech)
     robot_speech = get_param("perception/robot_speech")
-    if robot_speech != "ON":
+    if robot_speech is not True:
         # print(robot_speech)
         byte_str = makeByteStr(callerSpeech)
         buff.put(byte_str)
@@ -217,7 +217,7 @@ def listen_print_loop(recognize_stream):
         if not result.is_final:
             # sys.stdout.write(transcript + overwrite_chars + '\r')
             # sys.stdout.flush()
-            rospy.set_param("perception/human_speech", "ON")
+            rospy.set_param("perception/human_speech", True)
 
             num_chars_printed = len(transcript)
 
@@ -252,7 +252,7 @@ def callbackFromGoogle(recognitionWord):
         }
     }
 
-    rospy.set_param("perception/human_speech", "OFF")
+    rospy.set_param("perception/human_speech", False)
 
     jsonString = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
     pub.publish(jsonString)
