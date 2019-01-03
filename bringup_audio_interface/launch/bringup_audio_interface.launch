@@ -1,6 +1,6 @@
 <launch>
-	<param name="perception/robot_speech" value="OFF"/>
-	<param name="perception/human_speech" value="OFF"/>
+	<param name="perception/robot_speech" value="false"/>
+	<param name="perception/human_speech" value="false"/>
 	<param name="perception/name" value=""/>
 
 	<arg name="DEVICE_INDEX" default="7"/>
