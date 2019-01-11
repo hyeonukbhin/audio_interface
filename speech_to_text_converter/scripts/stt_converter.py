@@ -127,7 +127,7 @@ def packetCallback(packetData, buff):
     global callerSpeech, idx, callerArray, frameIdx, endFlag, lastFrameIdx
     callerSpeech = packetData.data
     # print len(callerSpeech)
-    robot_speech = get_param("perception/robot_speech")
+    robot_speech = get_param("perception/robot_speech_silbot")
     if robot_speech is not True:
         # print(robot_speech)
         byte_str = makeByteStr(callerSpeech)
@@ -256,9 +256,9 @@ def callbackFromGoogle(recognitionWord):
 
     jsonString = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
     pub.publish(jsonString)
-    print "===================================================================="
+    print "============================================================"
     print " Recognized Dialog : \x1b[1;33m%s\x1b[1;m" % inputString
-    print "===================================================================="
+    print "============================================================"
     # print "===================================================================="
     # print " Topic Published : \x1b[1;33m[/recognitionResult]\x1b[1;m"
     # print " \x1b[1;34mKIST_stt_converter -> KIST_data_collector\x1b[1;m"
@@ -300,7 +300,7 @@ def sttConverter():
             recognize_stream.cancel()
         except grpc.RpcError as e:
             code = e.code()
-            print("tttt")
+            # print("tttt")
             # CANCELLED is caused by the interrupt handler, which is expected.
             if code is not code.CANCELLED:
                 raise
