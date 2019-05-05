@@ -1,6 +1,9 @@
 <launch>
 	<param name="parameter/robot_speech" value="0"/>
 	<param name="parameter/name" value=""/>
+	<param name="
+    robot_speech = get_param("perception/robot_speech_silbot")
+            rospy.set_param("perception/human_speech", True)
 
 	<arg name="DEVICE_INDEX" default="7"/>
 	<arg name="CHANNELS" default="1"/>

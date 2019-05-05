@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 from __future__ import division
 import rospy
@@ -58,9 +58,9 @@ class rosSpinThread (threading.Thread):
         self.threadID = threadID
         self.name = name
     def run(self):
-        print "Starting " + self.name
+        print("Starting " + self.name)
         rospy.spin()
-        print "Exiting " + self.name
+        print("Exiting " + self.name)
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
@@ -256,9 +256,9 @@ def callbackFromGoogle(recognitionWord):
 
     jsonString = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
     pub.publish(jsonString)
-    print "============================================================"
-    print " Recognized Dialog : \x1b[1;33m%s\x1b[1;m" % inputString
-    print "============================================================"
+    print("============================================================")
+    print(" Recognized Dialog : \x1b[1;33m%s\x1b[1;m" % inputString)
+    print("============================================================")
     # print "===================================================================="
     # print " Topic Published : \x1b[1;33m[/recognitionResult]\x1b[1;m"
     # print " \x1b[1;34mKIST_stt_converter -> KIST_data_collector\x1b[1;m"
@@ -290,7 +290,7 @@ def sttConverter():
         recognize_stream = service.StreamingRecognize(
             requests, DEADLINE_SECS)
 
-        # print recognize_stream
+        print(recognize_stream)
         # Exit things cleanly on interrupt
         signal.signal(signal.SIGINT, lambda *_: recognize_stream.cancel())
 
@@ -319,4 +319,4 @@ if __name__ == '__main__':
         try:
             sttConverter()
         except Exception as e:
-            print("")
+            print("aa")

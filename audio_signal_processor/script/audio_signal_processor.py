@@ -58,11 +58,14 @@ class AudioSignalProcessor:
             self.voice_feature.header.seq = msg_sequence
             self.voice_feature.header.frame_id = "voice_feature"
             self.voice_feature.header.stamp = rospy.Time.now()
-            # self.voice_feature.amplitude = amplitude
+            self.voice_feature.amplitude = amplitude[:30]
             self.voice_feature.pitch = pitch
             self.voice_feature.intensity = intensity
-            self.pub_voice_feature.publish(self.voice_feature)
-            self.play_audio(amplitude)
+            human_speech = rospy.get_param("perception/human_speech")
+
+            if human_speech is True:
+                self.pub_voice_feature.publish(self.voice_feature)
+                # self.play_audio(amplitude)
             self.wav_array = np.array([])
 
 

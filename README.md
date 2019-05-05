@@ -5,6 +5,8 @@ ROS 기반 Audio 입출력 Interface
 
 ## 1. Description
 
+현재 stt_converter google v1beta1 문제가 있어서 동작 안함.
+audio_stramer + audio_signal_processor 만 이용함. (수정 !!꼮!!해야함 190505)
 
 ### 1.1 Framework Structure
 
@@ -16,8 +18,11 @@ ROS 기반 Audio 입출력 Interface
 -	[ROS](http://wiki.ros.org/) - Robot Operating System.
 -	Many python package(requirements.txt에 기재)
 ```
-sudo pip install -r requirements.txt
 sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+sudo pip install -r requirements.txt
+sudo pip install --upgrade pip setuptools
+sudo pip install --upgrade pip setuptools
+sudo pip install --upgrade pyasn1
 ```
 
 ## 3. Usage

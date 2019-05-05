@@ -26,6 +26,7 @@ acc_y = []
 acc_z = []
 
 
+
 class AudioSignalGui:
     # Calibration pair distance parameter
     def __init__(self):
