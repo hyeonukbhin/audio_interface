@@ -20,6 +20,7 @@ from six.moves import queue
 import os
 import sounddevice as sd
 import rospkg
+import rospkg
 
 pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
 service_key_path = pack_path + "/scripts/service_key.json"
