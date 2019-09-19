@@ -1,29 +1,5 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
-
-# Copyright 2017 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""Google Cloud Speech API sample application using the streaming API.
-NOTE: This module requires the additional dependency `pyaudio`. To install
-using pip:
-    pip install pyaudio
-Example usage:
-    python transcribe_streaming_mic.py
-"""
-
-
 # [START speech_transcribe_streaming_mic]
 from __future__ import division
 
@@ -37,20 +13,20 @@ import pyaudio
 from six.moves import queue
 import rospkg
 import os
-
+import rospy
+from std_msgs.msg import String
+from audio_msgs.msg import AudioData
+import threading
+import json
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
+# [set path]
 pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
 service_key_path = pack_path + "/scripts/service_key.json"
 
-# sd.default.device
-# sd.default.samplerate = 16000
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"] = service_key_path
-
-
 
 # Audio recording parameters
 CHANNELS = 1
@@ -59,77 +35,36 @@ LOOP_RATE = 20
 CHUNK = int(RATE / LOOP_RATE)  # 100ms
 
 
-class MicrophoneStream(object):
+class RosTopicStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
+
     def __init__(self, rate, chunk):
+        global pub
         self._rate = rate
         self._chunk = chunk
-
-        # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
+        rospy.init_node('KIST_stt_converter', anonymous=False)
+        pub = rospy.Publisher('recognitionResult', String, queue_size=100)
+        rospy.Subscriber("audio_stream", AudioData, self.packet_callback)
         self.closed = True
 
     def __enter__(self):
-
-        format = pyaudio.paInt16
-        audio_interface = pyaudio.PyAudio()
-
-        info = audio_interface.get_host_api_info_by_index(0)
-        numdevices = info.get('deviceCount')
-
-        device_index = 0
-        device_name = "Not Selected"
-        for i in range(0, numdevices):
-            if (audio_interface.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
-                name = audio_interface.get_device_info_by_host_api_device_index(0, i).get('name')
-                print "Input Device id ", i, " - ", name
-                if "USB Audio Device" in name:
-                    device_index = i
-                    device_name = name
-        print("\x1b[1;33m[Device Information] : {}\x1b[1;m".format(device_name))
-
-        # if rospy.has_param('~DEVICE_INDEX'):
-        #     INPUT_DEVICE = rospy.get_param('~DEVICE_INDEX')
-        #     CHANNELS = rospy.get_param('~CHANNELS')
-        #     RATE = rospy.get_param('~RATE')
-        #     LOOP_RATE = rospy.get_param('~LOOP_RATE')
-        #     CHUNK = rospy.get_param('~CHUNK')
-        #     # CHUNK = int(RATE / LOOP_RATE)  # 100ms
-        #
-        # else:
-        INPUT_DEVICE = device_index
-
-        self._audio_interface = pyaudio.PyAudio()
-        self._audio_stream = self._audio_interface.open(
-            format=pyaudio.paInt16,
-            # The API currently only supports 1-channel (mono) audio
-            # https://goo.gl/z757pE
-            channels=1, rate=self._rate,
-            input_device_index=INPUT_DEVICE,
-            input=True, frames_per_buffer=self._chunk,
-            # Run the audio stream asynchronously to fill the buffer object.
-            # This is necessary so that the input device's buffer doesn't
-            # overflow while the calling thread makes network requests, etc.
-            stream_callback=self._fill_buffer,
-        )
-
         self.closed = False
-
         return self
 
     def __exit__(self, type, value, traceback):
-        self._audio_stream.stop_stream()
-        self._audio_stream.close()
+        # self._audio_stream.stop_stream()
+        # self._audio_stream.close()
         self.closed = True
         # Signal the generator to terminate so that the client's
         # streaming_recognize method will not block the process termination.
         self._buff.put(None)
-        self._audio_interface.terminate()
+        # self._audio_interface.terminate()
 
-    def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
-        """Continuously collect data from the audio stream, into the buffer."""
-        self._buff.put(in_data)
-        return None, pyaudio.paContinue
+    # def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
+    #     """Continuously collect data from the audio stream, into the buffer."""
+    #     self._buff.put(in_data)
+    #     return None, pyaudio.paContinue
 
     def generator(self):
         while not self.closed:
@@ -140,7 +75,8 @@ class MicrophoneStream(object):
             if chunk is None:
                 return
             data = [chunk]
-
+            # print(data)
+            # print(chunk)
             # Now consume whatever other data's still buffered.
             while True:
                 try:
@@ -148,10 +84,22 @@ class MicrophoneStream(object):
                     if chunk is None:
                         return
                     data.append(chunk)
+                    # print(data)
+                    # print(chunk)
                 except queue.Empty:
                     break
 
             yield b''.join(data)
+
+    def packet_callback(self, packet):
+        caller_speech = packet.data
+        byte_str = self.make_bytestr(caller_speech)
+        self._buff.put(byte_str)
+
+    def make_bytestr(self, int16Array):
+        byte_str = "".join(map(chr, int16Array))
+        # byte_str = struct.pack('>%si' % len(int16Array), *int16Array)
+        return byte_str
 
 
 def listen_print_loop(responses):
@@ -197,8 +145,9 @@ def listen_print_loop(responses):
         else:
             # print(transcript + overwrite_chars)
             result = str(transcript + overwrite_chars)
-            print("결과 값 : {}".format(result))
-            print("결과 값 : {}".format("은지야 생일 선물 고마웡"))
+
+            send_topic(result)
+            # print("결과 값 : {}".format(result))
 
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
@@ -209,10 +158,30 @@ def listen_print_loop(responses):
             num_chars_printed = 0
 
 
-def main():
-    # See http://g.co/cloud/speech/docs/languages
-    # for a list of supported languages.
-    # language_code = 'en-US'  # a BCP-47 language tag
+def send_topic(sentence):
+    current_time = rospy.get_rostime()
+    input_string = str(sentence)
+    name = ""
+    jsonSTTFrame = {
+        "header": {
+            "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
+            "source": "perception",
+            "target": ["planning", "dialog"],
+            "content": ["human_speech"]
+        },
+        "human_speech": {
+            "name": name,
+            "speech": "%s" % input_string
+        }
+    }
+
+    rospy.set_param("perception/human_speech", False)
+
+    json_string = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
+    pub.publish(json_string)
+
+
+def sttConverter():
     language_code = 'ko-KR'  # a BCP-47 language tag
 
     client = speech.SpeechClient()
@@ -224,18 +193,36 @@ def main():
         config=config,
         interim_results=True)
 
-    with MicrophoneStream(RATE, CHUNK) as stream:
+    with RosTopicStream(RATE, CHUNK) as stream:
         audio_generator = stream.generator()
         requests = (types.StreamingRecognizeRequest(audio_content=content)
                     for content in audio_generator)
 
-        responses = client.streaming_recognize(streaming_config, requests)
+        # responses = client.streaming_recognize(streaming_config, requests)
+        # # Now, put the transcription responses to use.
+        # listen_print_loop(responses)  # signal.pause()
+
+        try:
+            responses = client.streaming_recognize(streaming_config, requests)
+        except Exception as exception:
+            # Output unexpected Exceptions.
+            print("exception exception exception exception exception ")
 
         # Now, put the transcription responses to use.
-        listen_print_loop(responses)
+        try:
+            listen_print_loop(responses)
+        except Exception as exception:
+            # Output unexpected Exceptions.
+            # print("")
+            return
+            # listen_print_loop(responses)
 
-
+    sttConverter()
+    rospy.spin()
 
 if __name__ == '__main__':
-    main()
-# [END speech_transcribe_streaming_mic]
+    while True:
+        try:
+            sttConverter()
+        except Exception as e:
+            print("...")
