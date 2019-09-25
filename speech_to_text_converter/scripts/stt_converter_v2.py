@@ -115,6 +115,8 @@ def listen_print_loop(responses):
     final one, print a newline to preserve the finalized transcription.
     """
     num_chars_printed = 0
+    # print("d")
+    test_idx = 0
     for response in responses:
         if not response.results:
             continue
@@ -129,6 +131,7 @@ def listen_print_loop(responses):
         # Display the transcription of the top alternative.
         transcript = result.alternatives[0].transcript
 
+
         # Display interim results, but with a carriage return at the end of the
         # line, so subsequent lines will overwrite them.
         #
@@ -139,7 +142,10 @@ def listen_print_loop(responses):
         if not result.is_final:
             sys.stdout.write(transcript + overwrite_chars + '\r')
             sys.stdout.flush()
+            print(test_idx)
+            # print(text_idx)
 
+            test_idx +=1
             num_chars_printed = len(transcript)
 
         else:
@@ -147,7 +153,9 @@ def listen_print_loop(responses):
             result = str(transcript + overwrite_chars)
 
             send_topic(result)
-            # print("결과 값 : {}".format(result))
+            print(result)
+            print("결과 값 : {}".format(result))
+
 
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
@@ -176,7 +184,6 @@ def send_topic(sentence):
     }
 
     rospy.set_param("perception/human_speech", False)
-
     json_string = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
     pub.publish(json_string)
 
