@@ -10,7 +10,6 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 import pyaudio
-# import google.cloud.s
 from six.moves import queue
 import rospkg
 import os
@@ -95,6 +94,7 @@ class RosTopicStream(object):
     def packet_callback(self, packet):
         caller_speech = packet.data
         byte_str = self.make_bytestr(caller_speech)
+        # print("ttt")
         self._buff.put(byte_str)
 
     def make_bytestr(self, int16Array):
@@ -118,9 +118,7 @@ def listen_print_loop(responses):
     num_chars_printed = 0
     # print("d")
     test_idx = 0
-    print(responses)
     for response in responses:
-
         if not response.results:
             continue
 
@@ -128,6 +126,7 @@ def listen_print_loop(responses):
         # the first result being considered, since once it's `is_final`, it
         # moves on to considering the next utterance.
         result = response.results[0]
+        print(result)
         if not result.alternatives:
             continue
 
@@ -141,17 +140,11 @@ def listen_print_loop(responses):
         # If the previous result was longer than this one, we need to print
         # some extra spaces to overwrite the previous result
         overwrite_chars = ' ' * (num_chars_printed - len(transcript))
-        # print(type(result))
-        # print(result)
-        import google.api_core.grpc_helpers
-        # google.api_core.grpc_helpers._StreamingResponseIterator
-        # print(response.results[0])
-        if not result.is_final:
-            # sys.stdout.write(transcript + overwrite_chars + '\r')
-            # sys.stdout.flush()
-            # print(test_idx)
 
-            # print(transcript + overwrite_chars + '\r')
+        if not result.is_final:
+            sys.stdout.write(transcript + overwrite_chars + '\r')
+            sys.stdout.flush()
+            print(test_idx)
             # print(text_idx)
 
             test_idx +=1
@@ -203,7 +196,6 @@ def sttConverter():
     client = speech.SpeechClient()
     config = types.RecognitionConfig(
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        # single_utterance=True,
         sample_rate_hertz=RATE,
         language_code=language_code)
     streaming_config = types.StreamingRecognitionConfig(
@@ -228,14 +220,12 @@ def sttConverter():
         # Now, put the transcription responses to use.
         try:
             listen_print_loop(responses)
-
-            # signal.pu
         except Exception as exception:
             # Output unexpected Exceptions.
             # print("")
             return
             # listen_print_loop(responses)
-    print("tttt")
+
     sttConverter()
     rospy.spin()
 
@@ -244,5 +234,4 @@ if __name__ == '__main__':
         try:
             sttConverter()
         except Exception as e:
-            print(e)
-            # print("...")
+            print("...")

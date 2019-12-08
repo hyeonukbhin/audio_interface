@@ -49,6 +49,39 @@ def send_sp(name, loc_x, loc_y, loc_z):
     }
     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
     pub_recog_topic.publish(json_string)
+import random
+
+def send_dialog(name, intent, info_dict):
+    current_time = rospy.get_rostime()
+    # info_dict = {
+    #     "gender": "남성",
+    #     "age": "노인",
+    #     "sleep_status": "positive",
+    #     "disease_status": "positive",
+    #     "meal_menu": "설렁탕",
+    #     "take_medicine": "negative"
+    # }
+    msgs_dict = {
+        "header": {
+            "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
+            "source": "planning",
+            "target": ["dialog"],
+            "content": ["dialog_generation"]
+        },
+        "dialog_generation": {
+            "id": random.randint(100, 199),
+            "name": name,
+            "intent": intent,
+            "social_context": {
+                **info_dict
+            }
+        }
+    }
+    # print(msgs_dict)
+
+    json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
+    pub_task_topic.publish(json_string)
+
 
 
 def callback_cmd(user_idx, speed=1):
@@ -125,22 +158,51 @@ def callback_cmd(user_idx, speed=1):
     #                  "엄마의 판단에 맞서기 위해 북쪽으로 갑니다.",
     #                  "나의 구세주는 샌들, 드레스, 셔츠입니다."
     #                  ]
+    intent_list = ["saying_welcome",
+                   "check_information_sleep",
+                   "transmit_information_reaction",
+                   "check_information_disease",
+                   "check_information_meal",
+                   "transmit_information_disease_advice",
+                   "check_information_health",
+                   "transmit_information_health_advice",
+                   "saying_good_bye",
+                   "saying_good_bye"
+                   ]
 
-    speech_user_3 = ["어 너냐 잘잤다.",
+    speech_user_3 = ["응 안녕",
+                    "어 너냐 잘잤다.",
                      "꿈 꿀 새도 없이 곯아 떨어졌지.",
                      "고맙다.",
                      "좋아진 것 같아.",
                      "아 그럼 니가 맨날 말해주잖아.",
-                     "오늘 아침 먹고 30분 후에 먹었지.",
-                     "싱겁게 먹었어 흰 죽이랑 시금치 무침 먹었어.",
+                     "오늘 아침 먹고 30분 후에 먹었지 흰 죽이랑 시금치 무침 먹었어.",
+                     "싱겁게 먹었어.",
                      "그렇지.",
-                     "야 고맙다. 니 덕분에 약 시간 안놓치고 꾸준히 약 먹는다.",
+                     "응 먹었다. 니 덕분에 약 시간 안놓치고 꾸준히 약 먹는다.",
                      "오냐.",
-                     "어 다녀왔지.",
-                     "그렇지?",
-                     "아 어제 어쩐지 뭐 새로운 약을 주더라. 이것도 식후 30분 후에 먹는건가? 어제 들었는데도 내가 요즘 자꾸 깜빡해.",
-                     "오늘도 니가 약 먹을 시간 알려줘야 겠다.",
+                     "",
+                     # "어 다녀왔지.",
+                     # "그렇지?",
+                     # "아 어제 어쩐지 뭐 새로운 약을 주더라. 이것도 식후 30분 후에 먹는건가? 어제 들었는데도 내가 요즘 자꾸 깜빡해.",
+                     # "오늘도 니가 약 먹을 시간 알려줘야 겠다.",
                      ]
+
+
+    info_dict_list = [{},
+                      {"name": "이병현", "gender": "남성", "age": "노인"},
+                      {},
+                      {"sleep_status": "positive"},
+                      {"disease_name": "고혈압"},
+                      {"": ""},
+                      {"disease_name": "고혈압", "disease_advice": "싱거운 음식 섭취"},
+                      {"": ""},
+                      {"take_medicine_schedule": "식후 30분 후"},
+                      {"": ""},
+                      {"": ""},
+                      ]
+
+
 
     speech_user_4 = ["네.",
                      "네.. 처음입니다.",
@@ -187,9 +249,13 @@ def callback_cmd(user_idx, speed=1):
     if user_idx == 4:
         # 3.4, 2.5, 3.5, 4.6, 4.8
         # M, M, M, H ,H
-        for speech in speech_user_3:
+        # for speech in speech_user_3:
+        for idx in range(len(speech_user_3)):
+
             name = "이병현"
-            send_speech(name, speech)
+            send_dialog(name, intent_list[idx], info_dict_list[idx])
+            rospy.sleep(speed)
+            send_speech(name, speech_user_3[idx])
             rospy.sleep(speed)
 
     if user_idx == 5:
@@ -246,12 +312,18 @@ def terminal_loop():
 
 def scenario_simulator():
     global pub_recog_topic
+    global pub_task_topic
+
     rospy.init_node('dummy_stt_converter', anonymous=False)
     # rospy.Subscriber("simulation_trigger", String, callback_cmd)
     pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
     # pub_dialog_topic = rospy.Publisher("dialogResult", String, queue_size=100)
     # pub_task_topic = rospy.Publisher("taskCompletion", String, queue_size=100)
     # pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
+    # rospy.Subscriber("taskResult", String, callback_task)
+    pub_task_topic = rospy.Publisher("taskExecution", String, queue_size=100)
+
+
     terminal_loop()
     rospy.spin()
     # rospy.s
