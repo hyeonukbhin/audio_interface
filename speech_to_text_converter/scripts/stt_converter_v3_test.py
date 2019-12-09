@@ -126,7 +126,7 @@ def listen_print_loop(responses):
         # the first result being considered, since once it's `is_final`, it
         # moves on to considering the next utterance.
         result = response.results[0]
-        print(result)
+        # print(result)
         if not result.alternatives:
             continue
 
@@ -155,7 +155,7 @@ def listen_print_loop(responses):
             result = str(transcript + overwrite_chars)
 
             send_topic(result)
-            print(result)
+            # print(result)
             print("결과 값 : {}".format(result))
 
 
