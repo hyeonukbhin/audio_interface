@@ -5,7 +5,8 @@ import rospy
 from std_msgs.msg import String
 import rospkg
 import csv
-
+from signal import signal, SIGINT
+from sys import exit
 
 def send_speech(name, speech):
     msgs_dict = {}
@@ -51,36 +52,36 @@ def send_sp(name, loc_x, loc_y, loc_z):
     pub_recog_topic.publish(json_string)
 import random
 
-def send_dialog(name, intent, info_dict):
-    current_time = rospy.get_rostime()
-    # info_dict = {
-    #     "gender": "남성",
-    #     "age": "노인",
-    #     "sleep_status": "positive",
-    #     "disease_status": "positive",
-    #     "meal_menu": "설렁탕",
-    #     "take_medicine": "negative"
-    # }
-    msgs_dict = {
-        "header": {
-            "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
-            "source": "planning",
-            "target": ["dialog"],
-            "content": ["dialog_generation"]
-        },
-        "dialog_generation": {
-            "id": random.randint(100, 199),
-            "name": name,
-            "intent": intent,
-            "social_context": {
-                **info_dict
-            }
-        }
-    }
-    # print(msgs_dict)
-
-    json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
-    pub_task_topic.publish(json_string)
+# def send_dialog(name, intent, info_dict):
+#     current_time = rospy.get_rostime()
+#     # info_dict = {
+#     #     "gender": "남성",
+#     #     "age": "노인",
+#     #     "sleep_status": "positive",
+#     #     "disease_status": "positive",
+#     #     "meal_menu": "설렁탕",
+#     #     "take_medicine": "negative"
+#     # }
+#     msgs_dict = {
+#         "header": {
+#             "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
+#             "source": "planning",
+#             "target": ["dialog"],
+#             "content": ["dialog_generation"]
+#         },
+#         "dialog_generation": {
+#             "id": random.randint(100, 199),
+#             "name": name,
+#             "intent": intent,
+#             "social_context": {
+#                 **info_dict
+#             }
+#         }
+#     }
+#     # print(msgs_dict)
+#
+#     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
+#     pub_task_topic.publish(json_string)
 
 
 
@@ -171,13 +172,13 @@ def callback_cmd(user_idx, speed=1):
                    ]
 
     speech_user_3 = ["응 안녕",
-                    "어 너냐 잘잤다.",
-                     "꿈 꿀 새도 없이 곯아 떨어졌지.",
+                     "어 너구나. 잘잤다.",
+                     "꿈 꿀 새도 없이 잠들어 버졌지.",
                      "고맙다.",
-                     "좋아진 것 같아.",
+                     "좋아졌어 같아.",
                      "아 그럼 니가 맨날 말해주잖아.",
-                     "오늘 아침 먹고 30분 후에 먹었지 흰 죽이랑 시금치 무침 먹었어.",
-                     "싱겁게 먹었어.",
+                     "오늘 아침 먹고 30분 후에 먹었지 죽이랑 시금치 무침 먹었어.",
+                     "안 짜게 먹었어.",
                      "그렇지.",
                      "응 먹었다. 니 덕분에 약 시간 안놓치고 꾸준히 약 먹는다.",
                      "오냐.",
@@ -207,9 +208,9 @@ def callback_cmd(user_idx, speed=1):
     speech_user_4 = ["네.",
                      "네.. 처음입니다.",
                      "아 그렇군요 저도 요즘 기관지염 때문에 고생입니다.",
-                     "아 그게 알고 있는데도 물 마시는걸 자꾸 까먹습니다.",
+                     "아 그게 알고 있는데도 물 마시는걸 자꾸 잊어버립니다.",
                      "가만히 있어보자 오늘 아침에 마셨나?",
-                     "그래주면 고맙죠.",
+                     "그래주면 고맙습니다.",
                      "네.",
                      "아이쿠 깜빡할뻔 했네. 물은 어디서 마실 수 있나요?",
                      "고마워요."
@@ -220,7 +221,7 @@ def callback_cmd(user_idx, speed=1):
         user_name = str(input("-> "))
 
         print(user_name)
-        while True:
+        while not rospy.is_shutdown():
             print("사용자의 발화문을 입력해 주세요.")
             speech = input("-> ")
             # name = str(name)
@@ -253,8 +254,8 @@ def callback_cmd(user_idx, speed=1):
         for idx in range(len(speech_user_3)):
 
             name = "이병현"
-            send_dialog(name, intent_list[idx], info_dict_list[idx])
-            rospy.sleep(speed)
+            # send_dialog(name, intent_list[idx], info_dict_list[idx])
+            # rospy.sleep(speed)
             send_speech(name, speech_user_3[idx])
             rospy.sleep(speed)
 
@@ -309,6 +310,9 @@ def terminal_loop():
         elif mode == 0:
             callback_cmd(0)
 
+def termination_handler(signal_received, frame):
+    print('SIGINT or CTRL-C detected. Exiting gracefully')
+    exit(0)
 
 def scenario_simulator():
     global pub_recog_topic
@@ -330,4 +334,6 @@ def scenario_simulator():
 
 
 if __name__ == '__main__':
+    signal(SIGINT, termination_handler)
+
     scenario_simulator()

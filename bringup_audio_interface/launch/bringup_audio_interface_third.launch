@@ -1,0 +1,10 @@
+<launch>
+	<param name="perception/is_speaking_human/data" value="False"/>
+	<param name="perception/is_speaking_robot/data" value="False"/>
+	<node name="audio_streamer" pkg="audio_streamer" type="audio_stream_from_mic.py" output="screen">
+	</node>
+    <node name="KIST_stt_converter" pkg="speech_to_text_converter" type="stt_converter_v4.py" output="screen">
+	</node>
+</launch>
+
+

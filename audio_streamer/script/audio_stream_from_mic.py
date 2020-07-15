@@ -10,6 +10,10 @@ import time
 import pylab
 import numpy as np
 
+CHANNELS = 1
+RATE = 44100
+LOOP_RATE = 5
+
 def main():
     rospy.init_node('audio_streamer')
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=100)
@@ -45,9 +49,7 @@ def main():
     # else:
     INPUT_DEVICE = device_index
     print("\x1b[1;33m[Device Information] : {}\x1b[1;m".format(device_name))
-    CHANNELS = 1
-    RATE = 44100
-    LOOP_RATE = 10
+
     # CHUNK = 8192  # 100ms
     CHUNK = RATE/LOOP_RATE  # 100ms
 
@@ -77,7 +79,7 @@ def main():
 
             byte_buff = stream.read(CHUNK)
             rms = audioop.rms(byte_buff, 2)
-            soundplot(byte_buff)
+            # soundplot(byte_buff)
             # print(rms)
 
 
@@ -92,13 +94,13 @@ def main():
 
             audio_stream.data = int16_buff
 
-            print(int16_buff)
-            print("testtest")
+            # print(int16_buff)
+            # print("testtest")
 
 
             # if rms > 1000:
             scan_pub.publish(audio_stream)
-            print(len(int16_buff))
+            # print(len(int16_buff))
             msg_sequence += 1
 
             # print(byte_buff[:20])
@@ -110,21 +112,21 @@ def main():
 
         r.sleep()
 
-def soundplot(byte_buff):
-    t1=time.time()
-    RATE = 44100
-    LOOP_RATE = 10
-    CHUNK = int(RATE/LOOP_RATE)  # 100ms
-
-    data = np.fromstring(byte_buff,dtype=np.int16)
-    pylab.plot(data)
-    pylab.title("ttt")
-    pylab.grid()
-    pylab.axis([0,len(data),-2**16/2,2**16/2])
-    pylab.savefig("03.png",dpi=50)
-    # pylab.show()
-    pylab.close('all')
-    # print("took %.02f ms"%((time.time()-t1)*1000))
+# def soundplot(byte_buff):
+#     t1=time.time()
+#     RATE = 44100
+#     LOOP_RATE = 20
+#     CHUNK = int(RATE/LOOP_RATE)  # 100ms
+#
+#     data = np.fromstring(byte_buff,dtype=np.int16)
+#     pylab.plot(data)
+#     pylab.title("ttt")
+#     pylab.grid()
+#     pylab.axis([0,len(data),-2**16/2,2**16/2])
+#     pylab.savefig("03.png",dpi=50)
+#     # pylab.show()
+#     pylab.close('all')
+#     # print("took %.02f ms"%((time.time()-t1)*1000))
 
 
 def make_stream(audio_interface, format, input_device_index, channels, rate, frames_per_buffer, input=True,
