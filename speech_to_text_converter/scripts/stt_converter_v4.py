@@ -151,7 +151,7 @@ def listen_print_loop(responses):
                 dialog = checked_result["checked"]
                 delayed_time = checked_result["time"]
                 send_topic(result)
-                rospy.loginfo('User Speech : {}'.format(colored(result, 'white', attrs=['bold'])))
+                # rospy.loginfo('User Speech : {}'.format(colored(result, 'white', attrs=['bold'])))
                 rospy.loginfo('User Speech : {} (Spell Checked, Delayed time : {})'.format(colored(dialog, 'white', attrs=['bold']),colored(delayed_time, 'white', attrs=['bold'])))
             else:
                 send_topic(result)
