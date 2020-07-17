@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 import json
 import rospy
@@ -7,6 +7,10 @@ import rospkg
 import csv
 from signal import signal, SIGINT
 from sys import exit
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 def send_speech(name, speech):
     msgs_dict = {}
@@ -218,16 +222,20 @@ def callback_cmd(user_idx, speed=1):
 
     if user_idx == 1:
         print("사용자의 이름을 입력해 주세요.")
-        user_name = str(input("-> "))
+        # test = raw_input("-> ")
+        # print(test)
+        # print(type(test))
+
+        user_name = str(raw_input("-> "))
 
         print(user_name)
         while not rospy.is_shutdown():
             print("사용자의 발화문을 입력해 주세요.")
-            speech = input("-> ")
+            speech = raw_input("-> ")
             # name = str(name)
             send_speech(user_name, str(speech))
             print("Press Enter to continue or Type exit to terminate")
-            end_flag = input("")
+            end_flag = raw_input("")
             if end_flag == "exit":
                 break
 
@@ -295,7 +303,7 @@ def terminal_loop():
         print("4. Persona : 이병헌 재생                    ")
         print("5. Persona : 강준한 재생                    ")
         print("0. DB 삭제                    ")
-        mode = int(input("-> "))
+        mode = int(raw_input("-> "))
 
         if mode == 1:
             callback_cmd(1)
@@ -314,7 +322,7 @@ def termination_handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     exit(0)
 
-def scenario_simulator():
+def dummy_stt_converter():
     global pub_recog_topic
     global pub_task_topic
 
@@ -325,7 +333,7 @@ def scenario_simulator():
     # pub_task_topic = rospy.Publisher("taskCompletion", String, queue_size=100)
     # pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
     # rospy.Subscriber("taskResult", String, callback_task)
-    pub_task_topic = rospy.Publisher("taskExecution", String, queue_size=100)
+    # pub_task_topic = rospy.Publisher("taskExecution", String, queue_size=100)
 
 
     terminal_loop()
@@ -336,4 +344,4 @@ def scenario_simulator():
 if __name__ == '__main__':
     signal(SIGINT, termination_handler)
 
-    scenario_simulator()
+    dummy_stt_converter()
