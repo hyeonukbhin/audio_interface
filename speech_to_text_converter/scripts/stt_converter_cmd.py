@@ -234,6 +234,8 @@ def callback_cmd(user_idx, speed=1):
             speech = raw_input("-> ")
             # name = str(name)
             send_speech(user_name, str(speech))
+            print(str(speech))
+
             print("Press Enter to continue or Type exit to terminate")
             end_flag = raw_input("")
             if end_flag == "exit":
