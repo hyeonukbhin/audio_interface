@@ -29,10 +29,14 @@ def main():
     audio_interface = pyaudio.PyAudio()
     # pa_format = get_pa_format(pcm_format)
     dvc_idx = get_device_idx(audio_interface, device_name)
+    if dvc_idx != 0:
+        print(colored("[Binding Information] ", 'blue', attrs=['bold']) + "Device Name : {}, Channels : {} , Sampling Frequency : {}, Loop Rate : {}".format(device_name, channels, sampling_frequency, loop_rate))
+    else:
+        print(colored("[Binding Information] ", 'blue', attrs=['bold']) + colored("Binding Failure", 'red', attrs=['bold']))
+
     r = rospy.Rate(LOOP_RATE)
 
     # print("[Binding Information] " + colored("Device Name : {}, Channels : {} , Sampling Frequency : {}, Loop Rate : {}".format(device_name, channels, sampling_frequency, loop_rate), 'blue', attrs=['bold']))
-    print(colored("[Binding Information] ", 'blue', attrs=['bold']) + "Device Name : {}, Channels : {} , Sampling Frequency : {}, Loop Rate : {}".format(device_name, channels, sampling_frequency, loop_rate))
     stream = make_stream(audio_interface, pyaudio.paInt16, dvc_idx, channels, sampling_frequency, chunk)
     msg_sequence = 0
     audio_stream = AudioData()
