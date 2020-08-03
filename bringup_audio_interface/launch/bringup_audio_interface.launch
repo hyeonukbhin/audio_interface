@@ -1,0 +1,28 @@
+<launch>
+    <arg name="device_name" default="USB Audio Device"/>
+    <arg name="channels" default="1"/>
+    <arg name="sampling_frequency" default="44100"/>
+    <arg name="loop_rate" default="5"/>
+    <arg name="with_spellchecker" default="true"/>
+
+	<param name="perception/human_name/data" value=""/>
+	<param name="perception/is_speaking_human/data" value="false"/>
+	<param name="perception/is_speaking_robot/data" value="false"/>
+
+	<node name="audio_streamer" pkg="audio_streamer" type="audio_stream_from_mic_v2.py" output="screen">
+		<param name="device_name" value="$(arg device_name)"/>
+        <param name="channels" value="$(arg channels)"/>
+        <param name="sampling_frequency" value="$(arg sampling_frequency)"/>
+        <param name="loop_rate" value="$(arg loop_rate)"/>
+	</node>
+    <node name="KIST_stt_converter" pkg="speech_to_text_converter" type="stt_converter_v4.py" output="screen">
+        <param name="sampling_frequency" value="$(arg sampling_frequency)"/>
+        <param name="loop_rate" value="$(arg loop_rate)"/>
+        <param name="with_spellchecker" value="$(arg with_spellchecker)"/>
+	</node>
+    <node name="KIST_text_translator" pkg="text_translator" type="text_translator.py" output="screen">
+	</node>
+
+</launch>
+
+
