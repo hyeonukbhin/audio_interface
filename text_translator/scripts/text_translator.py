@@ -53,9 +53,9 @@ def callback_speech(data):
 
         speech_en = translator.translate(speech_kr).text
 
-        print(speech_kr)
-        print(speech_en)
-        print("")
+        # print(speech_kr)
+        # print(speech_en)
+        # print("")
         send_translation(name, speech_kr, speech_en)
         # print(translator.translate('안녕하세요'))
 

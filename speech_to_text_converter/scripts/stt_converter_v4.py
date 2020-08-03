@@ -20,51 +20,54 @@ from termcolor import colored
 from signal import signal, SIGINT
 from sys import exit
 from hanspell import spell_checker
+import numpy as np
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 # [set path]
 pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
-service_key_path = pack_path + "/scripts/service_key.json"
+service_key_path = pack_path + "/service_key/service_key.json"
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"] = service_key_path
 
+# [set args]
 
 WITH_SPELLCHECKER = True
-
-CHANNELS = 1
-RATE = 44100
+SAMPLING_FREQUENCY = 44100
 LOOP_RATE = 5
-CHUNK = int(RATE / LOOP_RATE)  # 100ms
 
 
-def sttConverter():
+def stt_converter():
     language_code = 'ko-KR'  # a BCP-47 language tag
+
+    sampling_frequency = int(get_setting_from_launch("sampling_frequency", SAMPLING_FREQUENCY))
+    loop_rate = int(get_setting_from_launch("loop_rate", LOOP_RATE))
+    chunk = int(sampling_frequency / loop_rate)  # 100ms
 
     client = speech.SpeechClient()
     config = types.RecognitionConfig(
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
         # single_utterance=True,
-        sample_rate_hertz=RATE,
+        sample_rate_hertz=sampling_frequency,
         language_code=language_code)
     streaming_config = types.StreamingRecognitionConfig(
         config=config,
         interim_results=True)
 
-    with RosTopicStream(RATE, CHUNK) as stream:
+    with RosTopicStream(sampling_frequency, chunk) as stream:
         audio_generator = stream.generator()
         requests = (types.StreamingRecognizeRequest(audio_content=content)
                     for content in audio_generator)
 
         try:
             responses = client.streaming_recognize(streaming_config, requests)
-        except Exception as exception:
+        except Exception as e:
             print("exception exception exception exception exception ")
 
         try:
             listen_print_loop(responses)
-        except Exception as exception:
+        except Exception as e:
             return
     rospy.spin()
 
@@ -109,17 +112,16 @@ class RosTopicStream(object):
 
     def packet_callback(self, packet):
         caller_speech = packet.data
-        byte_str = self.make_bytestr(caller_speech)
+        byte_str = self.make_byte_array(caller_speech)
         robot_speech = get_param("perception/is_speaking_robot/data")
         if robot_speech is not True:
             self._buff.put(byte_str)
 
-    def make_bytestr(self, int16Array):
-        byte_str = "".join(map(chr, int16Array))
-        return byte_str
+    def make_byte_array(self, int16_array):
+        int16_buff = np.array(int16_array, dtype='int16')
+        byte_buff = int16_buff.tobytes()
+        return byte_buff
 
-
-#########################################################################
 
 def listen_print_loop(responses):
     num_chars_printed = 0
@@ -144,19 +146,17 @@ def listen_print_loop(responses):
 
         else:
             result = str(transcript + overwrite_chars)
-
-            if WITH_SPELLCHECKER is True:
-                # word = "안녕 하세요. 안녕 하세요. 안녕 하세요. "
+            with_spellchecker = get_setting_from_launch("with_spellchecker", WITH_SPELLCHECKER)
+            print(with_spellchecker)
+            if with_spellchecker is True:
                 checked_result = spell_checker.check(strip_one(result)).as_dict()
                 dialog = checked_result["checked"]
                 delayed_time = checked_result["time"]
                 send_topic(result)
-                # rospy.loginfo('User Speech : {}'.format(colored(result, 'white', attrs=['bold'])))
-                rospy.loginfo('User Speech : {} (Spell Checked, Delayed time : {})'.format(colored(dialog, 'white', attrs=['bold']),colored(delayed_time, 'white', attrs=['bold'])))
+                rospy.loginfo('User Speech : {} (Spell Checked, Delayed time : {})'.format(colored(dialog, 'white', attrs=['bold']), colored(delayed_time, 'white', attrs=['bold'])))
             else:
                 send_topic(result)
                 rospy.loginfo('User Speech : {}'.format(colored(result, 'white', attrs=['bold'])))
-
 
             if re.search(r'\b(exit|quit)\b', transcript, re.I):
                 print('Exiting..')
@@ -166,11 +166,11 @@ def listen_print_loop(responses):
 
 
 def strip_one(s):
-    if s.endswith(" ") : s = s[:-1] #마지막이 " "임을 검사
-    if s.startswith(" ") : s = s[1:] #첫번째가 " "임을 검사
+    if s.endswith(" "):
+        s = s[:-1]  # 마지막이 " "임을 검사
+    if s.startswith(" "):
+        s = s[1:]  # 첫번째가 " "임을 검사
     return s
-# a = "  hello  "
-# print strip_one(a)
 
 
 def get_param(param_name="state1"):
@@ -186,7 +186,7 @@ def send_topic(sentence):
     current_time = rospy.get_rostime()
     input_string = str(sentence)
     name = get_param("/perception/human_name/data")
-    jsonSTTFrame = {
+    json_frame = {
         "header": {
             "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
             "source": "perception",
@@ -202,8 +202,17 @@ def send_topic(sentence):
     # se.update_perception('human_name', human_name_data)
     rospy.set_param("perception/is_speaking_human/data", False)
     rospy.set_param("perception/is_speaking_human/timestamp", time.time())
-    json_string = json.dumps(jsonSTTFrame, ensure_ascii=False, indent=4)
+    json_string = json.dumps(json_frame, ensure_ascii=False, indent=4)
     pub.publish(json_string)
+
+
+def get_setting_from_launch(arg_name, default_arg):
+    try:
+        output = rospy.get_param('~{}'.format(arg_name))
+    except KeyError:
+        output = default_arg
+
+    return output
 
 
 def handler(signal_received, frame):
@@ -215,6 +224,6 @@ if __name__ == '__main__':
     signal(SIGINT, handler)
     while True:
         try:
-            sttConverter()
+            stt_converter()
         except Exception as e:
             print(e)

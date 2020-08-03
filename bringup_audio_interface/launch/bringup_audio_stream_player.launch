@@ -1,0 +1,9 @@
+<launch>
+	<node name="audio_stream_player" pkg="audio_streamer" type="audio_stream_player.py" output="screen">
+        <param name="sampling_frequency" value="44100"/>
+        <param name="play_overlap_chunk" value="20000"/>
+	</node>
+
+</launch>
+
+
