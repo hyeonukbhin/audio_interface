@@ -2,7 +2,10 @@ sHRI-Lab : Audio Interface
 ===========================================================
 
 ROS 기반 Audio 입출력 Interface
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f
 - Signal Processing
 - Speech to text Converter
 - Text translator
@@ -53,4 +56,8 @@ MIC Stream Player
 
 ```bash
 roslaunch bringup_audio_interface bringup_audio_stream_player.launch
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f
