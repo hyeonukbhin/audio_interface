@@ -1,6 +1,6 @@
-google-cloud-speech==0.36.3
+google-cloud-speech==1.2.0
 pyaudio==0.2.11
 numpy
 termcolor
-hanspell
-signal
+requests==2.18.4
+py-hanspell

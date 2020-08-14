@@ -152,7 +152,7 @@ def listen_print_loop(responses):
                 checked_result = spell_checker.check(strip_one(result)).as_dict()
                 dialog = checked_result["checked"]
                 delayed_time = checked_result["time"]
-                send_topic(result)
+                send_topic(dialog)
                 rospy.loginfo('User Speech : {} (Spell Checked, Delayed time : {})'.format(colored(dialog, 'white', attrs=['bold']), colored(delayed_time, 'white', attrs=['bold'])))
             else:
                 send_topic(result)
