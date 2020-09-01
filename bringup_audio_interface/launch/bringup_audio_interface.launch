@@ -1,6 +1,6 @@
 <launch>
-    <arg name="device_name" default="USB Audio Device"/>
-    <arg name="channels" default="1"/>
+    <arg name="device_name" default="USB PnP Sound Device"/>
+    <arg name="channels" default="2"/>
     <arg name="sampling_frequency" default="44100"/>
     <arg name="loop_rate" default="5"/>
     <arg name="with_spellchecker" default="true"/>
