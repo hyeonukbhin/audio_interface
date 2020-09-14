@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.6
 # -*- coding: utf-8 -*-
 from __future__ import division
 
@@ -21,8 +21,8 @@ from signal import signal, SIGINT
 from sys import exit
 import numpy as np
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 # [set path]
 pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
