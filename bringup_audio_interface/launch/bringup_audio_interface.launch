@@ -5,9 +5,13 @@
     <arg name="loop_rate" default="5"/>
     <arg name="with_spellchecker" default="true"/>
 
-	<param name="perception/human_name/data" value=""/>
-	<param name="perception/is_speaking_human/data" value="false"/>
-	<param name="perception/is_speaking_robot/data" value="false"/>
+    <arg name="human_name" default=""/>
+    <arg name="is_speaking_human" default="false"/>
+    <arg name="is_speaking_robot" default="false"/>
+
+    <param name="perception/human_name/data" value="$(arg human_name)"/>
+    <param name="perception/is_speaking_human/data" value="$(arg is_speaking_human)"/>
+    <param name="perception/is_speaking_robot/data" value="$(arg is_speaking_human)"/>
 
 	<node name="audio_streamer" pkg="audio_streamer" type="audio_stream_from_mic_v2.py" output="screen">
 		<param name="device_name" value="$(arg device_name)"/>

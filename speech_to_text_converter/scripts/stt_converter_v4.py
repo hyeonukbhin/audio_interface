@@ -19,7 +19,6 @@ import time
 from termcolor import colored
 from signal import signal, SIGINT
 from sys import exit
-from hanspell import spell_checker
 import numpy as np
 
 reload(sys)
@@ -149,6 +148,7 @@ def listen_print_loop(responses):
             with_spellchecker = get_setting_from_launch("with_spellchecker", WITH_SPELLCHECKER)
             print(with_spellchecker)
             if with_spellchecker is True:
+                from hanspell import spell_checker
                 checked_result = spell_checker.check(strip_one(result)).as_dict()
                 dialog = checked_result["checked"]
                 delayed_time = checked_result["time"]
