@@ -1,0 +1,25 @@
+<launch>
+    <arg name="device_name" default="USB PnP Sound Device"/>
+    <arg name="channels" default="2"/>
+    <arg name="sampling_frequency" default="44100"/>
+    <arg name="loop_rate" default="5"/>
+    <arg name="with_spellchecker" default="true"/>
+
+    <arg name="human_name" default=""/>
+    <arg name="is_speaking_human" default="false"/>
+    <arg name="is_speaking_robot" default="false"/>
+
+    <param name="perception/human_name/data" value="$(arg human_name)"/>
+    <param name="perception/is_speaking_human/data" value="$(arg is_speaking_human)"/>
+    <param name="perception/is_speaking_robot/data" value="$(arg is_speaking_human)"/>
+    <node name="KIST_stt_converter" pkg="speech_to_text_converter" type="stt_converter_v4.py" output="screen">
+        <param name="sampling_frequency" value="$(arg sampling_frequency)"/>
+        <param name="loop_rate" value="$(arg loop_rate)"/>
+        <param name="with_spellchecker" value="$(arg with_spellchecker)"/>
+	</node>
+    <node name="KIST_text_translator" pkg="text_translator" type="text_translator.py" output="screen">
+	</node>
+
+</launch>
+
+

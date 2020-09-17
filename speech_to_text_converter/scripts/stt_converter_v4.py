@@ -146,7 +146,7 @@ def listen_print_loop(responses):
         else:
             result = str(transcript + overwrite_chars)
             with_spellchecker = get_setting_from_launch("with_spellchecker", WITH_SPELLCHECKER)
-            print(with_spellchecker)
+            #print(with_spellchecker)
             if with_spellchecker is True:
                 from hanspell import spell_checker
                 checked_result = spell_checker.check(strip_one(result)).as_dict()
