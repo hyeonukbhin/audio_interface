@@ -43,6 +43,15 @@ rosrun audio_streamer check_input_device.py
 mv serivce_key.json speech_to_text_converter/service_key/
 ```
 
+google trans api NonType 문제
+
+```bash
+sudo pip3 uninstall googletrans
+git clone https://github.com/hyeonukbhin/py-googletrans
+cd py-googletrans
+sudo python3 setup.py install
+```
+
 
 ## 3. Usage
 --------
@@ -56,8 +65,4 @@ MIC Stream Player
 
 ```bash
 roslaunch bringup_audio_interface bringup_audio_stream_player.launch
-<<<<<<< HEAD
 ```
-=======
-```
->>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f

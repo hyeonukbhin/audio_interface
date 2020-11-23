@@ -1,10 +1,31 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.6
 # -*- coding: utf-8 -*-
 import rospy
 from std_msgs.msg import String
 # from pprintpp import pprint
 import json
 from googletrans import Translator
+import time
+from termcolor import colored
+
+while True:
+    try:
+        translator = Translator(service_urls=[
+            'translate.google.com',
+            'translate.google.co.kr',
+        ])
+        test_msg_kr = "시작"
+        test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
+        break
+
+    except AttributeError as e:
+        # rospy.loginfo("Cannot connect service url")
+        # rospy.loginfo("Reconnecting URL...")
+        print('[{}] {}'.format(time.time(), colored("Cannot Connect Translator Service URL", 'red', attrs=['bold'])))
+        print('[{}] {}'.format(time.time(), colored("Reconnecting Translator Service URL...", 'white', attrs=['bold'])))
+
+        time.sleep(1)
+print('[{}] {}'.format(time.time(), colored("Connected URL!!", 'blue', attrs=['bold'])))
 
 
 def send_translation(name, speech_kr, speech_en):
@@ -46,19 +67,9 @@ def callback_speech(data):
         speech_kr = json_dict["human_speech"]["speech"]
         info_dict = {}
         intent = ""
+        speech_en = translator.translate(speech_kr, dest='en', src='ko').text
 
-        # -*- coding: utf-8 -*-
-
-        translator = Translator()
-
-        speech_en = translator.translate(speech_kr).text
-
-        # print(speech_kr)
-        # print(speech_en)
-        # print("")
         send_translation(name, speech_kr, speech_en)
-        # print(translator.translate('안녕하세요'))
-
 
 def text_translator():
     global pub_translation
