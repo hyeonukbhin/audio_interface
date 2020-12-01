@@ -6,30 +6,60 @@ from std_msgs.msg import String
 import json
 from googletrans import Translator
 import time
+from termcolor import colored
+
 while True:
     try:
-        translator = Translator(service_urls=[
-            'translate.google.com',
-            'translate.google.co.kr',
-        ])
+        # translator = Translator(service_urls=[
+        #     'translate.google.com',
+        #     'translate.google.co.kr',
+        # ])
+        translator = Translator()
         test_msg_kr = "시작"
         test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
         break
 
     except AttributeError as e:
-        print("Cannot connect service url")
-        print("Reconnecting URL...")
+        # rospy.loginfo("Cannot connect service url")
+        # rospy.loginfo("Reconnecting URL...")
+        print('[{}] {}'.format(time.time(), colored("Cannot Connect Translator Service URL", 'red', attrs=['bold'])))
+        print('[{}] {}'.format(time.time(), colored("Reconnecting Translator Service URL...", 'white', attrs=['bold'])))
+
         time.sleep(1)
-
-
-print("Connected URL!!")
-
-while True:
-
-    speech_kr = "반갑습니다."
-    speech_en = translator.translate(speech_kr, dest='en', src='ko')
-    print(speech_en.text)
-    time.sleep(1)
+print('[{}] {}'.format(time.time(), colored("Connected URL!!", 'blue', attrs=['bold'])))
+#
+#
+# translator = Translator(service_urls=[
+#     'translate.google.com',
+#     'translate.google.co.kr',
+# ])
+# test_msg_kr = "시작"
+# test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
+#
+# while True:
+#     try:
+#         translator = Translator(service_urls=[
+#             'translate.google.com',
+#             'translate.google.co.kr',
+#         ])
+#         test_msg_kr = "시작"
+#         test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
+#         break
+#
+#     except AttributeError as e:
+#         print("Cannot connect service url")
+#         print("Reconnecting URL...")
+#         time.sleep(1)
+#
+#
+# print("Connected URL!!")
+#
+# while True:
+#
+#     speech_kr = "반갑습니다."
+#     speech_en = translator.translate(speech_kr, dest='en', src='ko')
+#     print(speech_en.text)
+#     time.sleep(1)
 
 
 # translations = translator.translate(['The quick brown fox', 'jumps over', 'the lazy dog'], dest='ko')
