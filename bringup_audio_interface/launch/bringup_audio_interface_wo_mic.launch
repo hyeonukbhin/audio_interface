@@ -17,7 +17,7 @@
         <param name="loop_rate" value="$(arg loop_rate)"/>
         <param name="with_spellchecker" value="$(arg with_spellchecker)"/>
 	</node>
-    <node name="KIST_text_translator" pkg="text_translator" type="text_translator.py" output="screen">
+    <node name="KIST_text_translator" pkg="text_translator" type="text_translator_v2.py" output="screen">
 	</node>
 
 </launch>

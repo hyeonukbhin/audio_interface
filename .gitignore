@@ -2,4 +2,5 @@
 .idea/
 venv/
 speech_to_text_converter/service_key/service_key.json
+text_translator/service_key/translation_service_key.json
 speech_to_text_converter/scripts/service_key.json

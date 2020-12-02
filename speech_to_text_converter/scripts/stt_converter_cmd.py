@@ -8,6 +8,7 @@ import csv
 from signal import signal, SIGINT
 from sys import exit
 import sys
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -54,7 +55,10 @@ def send_sp(name, loc_x, loc_y, loc_z):
     }
     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
     pub_recog_topic.publish(json_string)
+
+
 import random
+
 
 # def send_dialog(name, intent, info_dict):
 #     current_time = rospy.get_rostime()
@@ -86,7 +90,6 @@ import random
 #
 #     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
 #     pub_task_topic.publish(json_string)
-
 
 
 def callback_cmd(user_idx, speed=1):
@@ -139,30 +142,6 @@ def callback_cmd(user_idx, speed=1):
                      "나의 구세주는 샌들, 드레스, 셔츠입니다."
                      ]
 
-    # speech_user_2_1 = ["모든 것을 알아 내려고 노력하고 있습니다.",
-    #                  "생생한 꽃, 케이티 이온, 넷플릭스 즉석 영화의 작은 것들",
-    #                  "그녀의 새로운 블랙 피코트와 사랑에 빠졌습니다. 또 누가 넘어갈까요?",
-    #                  "마침내 내일 휴식을 취하기를 바라고있다!",
-    #                  "술 크루즈 순회 공연에서 마이클 스콧의 춤이 정말 재미 있어요.",
-    #                  "새로운 곳에서 옛 친구와 함께 오래된 학교를 걷어차게되어 기쁘게 생각합니다.",
-    #                  "그녀는 일회용 카메라를 다시 사용하기 시작할 것입니다. 그녀는 스테파니에게 무엇이 나타날지 모른다는 게 매우 설렌다는 데 동의합니다",
-    #                  "오늘과 이번 주말에 아주 흥분됩니다.",
-    #                  "s g-ma는 가장 멋지다",
-    #                  "나쁜 하루를 보내고 있습니다. 대상, 신발, 좋은 아보카도 햄버거가 나를 데려 올 수있었습니다.",
-    #                  "여름 온도가 높습니다. 제이미, 조나, 미스터 지. 크리스 릴리에 푹 빠졌어",
-    #                  "돈, 치아 청소, 버스, 최고 비밀 사용, $ 40의 드레스, 따뜻하고 편안한 테마의 크리스마스 쇼핑, 밖이 얼마나 추운지 잊어 버립니다.",
-    #                  "그녀의 사랑을 재발견하고 있다.",
-    #                  "왜 netflix에 대기열에 6개 이상의 DVD가 있어야합니까? 나는 5개가 충분하다고 생각합니다.",
-    #                  "진정한 피가 할로윈 정신으로 나를 데려오고 있습니다.",
-    #                  "재정 문제를 잊어 버리십시오.",
-    #                  "제가 사용하는 침대에 문제가 있어요!!",
-    #                  "저랑 파리에 함께 가실 분 계신가요?",
-    #                  "강아지와 하는 산책이 너무 나를 행복하게 만들어요",
-    #                  "개인적으로 화가나는 일이 있어서 며칠동안 연락이 되지 않습니다.",
-    #                  "더이상 친구나 드라마에 의존하지 않을거에요.",
-    #                  "엄마의 판단에 맞서기 위해 북쪽으로 갑니다.",
-    #                  "나의 구세주는 샌들, 드레스, 셔츠입니다."
-    #                  ]
     intent_list = ["saying_welcome",
                    "check_information_sleep",
                    "transmit_information_reaction",
@@ -193,7 +172,6 @@ def callback_cmd(user_idx, speed=1):
                      # "오늘도 니가 약 먹을 시간 알려줘야 겠다.",
                      ]
 
-
     info_dict_list = [{},
                       {"name": "이병현", "gender": "남성", "age": "노인"},
                       {},
@@ -207,8 +185,6 @@ def callback_cmd(user_idx, speed=1):
                       {"": ""},
                       ]
 
-
-
     speech_user_4 = ["네.",
                      "네.. 처음입니다.",
                      "아 그렇군요 저도 요즘 기관지염 때문에 고생입니다.",
@@ -219,6 +195,30 @@ def callback_cmd(user_idx, speed=1):
                      "아이쿠 깜빡할뻔 했네. 물은 어디서 마실 수 있나요?",
                      "고마워요."
                      ]
+
+    speech_user_5 = ["안녕하세요",
+                     "최근에 기분이 너무 좋지 않아서 기분 전환 좀 할겸 최근에 미용실에 갔었어",
+                     "그런데 예약을 하고 가지 않아서 사람이 엄청 많더라고 그래서 너무 짜증났어",
+                     "거기다가 담당 미용사 분이 친절하지 않아서 머리 자르는 내내 불쾌했어",
+                     "이번에 갔던 미용실은 다시는 가고 싶지 않아",
+                     "정말 기분이 별로였어",
+                     "그래도 머리를 자르고 나니 슬펐던 기분이 조금 나아지더라구",
+                     "가끔씩 이런 전환이 필요한것 같아",
+                     ]
+
+
+
+    speech_user_6 = ["안녕 반가워",
+                     "최근에 악기를 배우기 시작했어",
+                     "뭘 배울까 고민하다가 기타를 배우기로 결정했어",
+                     "혼자서 치는것보다 다른 사람들이 하는것도 보고 열심히 하고 싶어서 학원에 등록했어",
+                     "생각했던것보다 분위기나 사람들이 너무 좋아서 굉장히 흥분 했었어",
+                     "앞으로 정말 열심히 노력해서 잘하게 될꺼야",
+                     "다른 사람들 앞에서 연주를 하는 것을 목표로 하고 있어",
+                     "이게 최근에 가장 재미 있었던 일인것 같아",
+                     ]
+
+
 
     if user_idx == 1:
         print("사용자의 이름을 입력해 주세요.")
@@ -262,7 +262,6 @@ def callback_cmd(user_idx, speed=1):
         # M, M, M, H ,H
         # for speech in speech_user_3:
         for idx in range(len(speech_user_3)):
-
             name = "이병현"
             # send_dialog(name, intent_list[idx], info_dict_list[idx])
             # rospy.sleep(speed)
@@ -275,6 +274,24 @@ def callback_cmd(user_idx, speed=1):
         for speech in speech_user_4:
             name = "강준한"
             send_speech(name, speech)
+            rospy.sleep(speed)
+
+    if user_idx == 6:
+        # 1.5, 4.4, 1.8, 2.0, 2.5
+        # L, H, L, L ,L
+        for speech in speech_user_5:
+            name = "persona1"
+            send_speech(name, speech)
+            print(speech)
+            rospy.sleep(speed)
+
+    if user_idx == 7:
+        # 1.5, 4.4, 1.8, 2.0, 2.5
+        # L, H, L, L ,L
+        for speech in speech_user_6:
+            name = "persona1"
+            send_speech(name, speech)
+            print(speech)
             rospy.sleep(speed)
 
     if user_idx == 0:
@@ -317,12 +334,18 @@ def terminal_loop():
             callback_cmd(4, speed=1)
         elif mode == 5:
             callback_cmd(5, speed=1)
+        elif mode == 6:
+            callback_cmd(6, speed=1)
+        elif mode == 7:
+            callback_cmd(7, speed=1)
         elif mode == 0:
             callback_cmd(0)
+
 
 def termination_handler(signal_received, frame):
     print('SIGINT or CTRL-C detected. Exiting gracefully')
     exit(0)
+
 
 def dummy_stt_converter():
     global pub_recog_topic
@@ -336,7 +359,6 @@ def dummy_stt_converter():
     # pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
     # rospy.Subscriber("taskResult", String, callback_task)
     # pub_task_topic = rospy.Publisher("taskExecution", String, queue_size=100)
-
 
     terminal_loop()
     rospy.spin()

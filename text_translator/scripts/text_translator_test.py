@@ -8,15 +8,19 @@ from googletrans import Translator
 import time
 from termcolor import colored
 
+from google.cloud import translate_v2 as translate
+
+import rospkg
+import os
+
+pack_path = rospkg.RosPack().get_path("text_translator")
+service_key_path = pack_path + "/service_key/translation_service_key.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_key_path
+
 while True:
     try:
-        # translator = Translator(service_urls=[
-        #     'translate.google.com',
-        #     'translate.google.co.kr',
-        # ])
-        translator = Translator()
-        test_msg_kr = "시작"
-        test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
+        client = translate.Client()
+
         break
 
     except AttributeError as e:
@@ -28,6 +32,12 @@ while True:
         time.sleep(1)
 print('[{}] {}'.format(time.time(), colored("Connected URL!!", 'blue', attrs=['bold'])))
 #
+
+result = client.translate('안녕하세요', source_language='ko', target_language='en')
+print(result["translatedText"])
+
+result = client.translate('반갑습니다', source_language='ko', target_language='en')
+print(result["translatedText"])
 #
 # translator = Translator(service_urls=[
 #     'translate.google.com',
