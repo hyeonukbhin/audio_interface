@@ -63,28 +63,31 @@ def get_header(json_dict):
 
 def callback_speech(data):
     # json_dict = json.loads(data.data.decode('utf-8'))
-    json_dict = json.loads(data.data)
-    source, target_list, content_list = get_header(json_dict)
-    # 사람 위치 추적 및 이름 파라미터 업데이
-    if ("dialog" in target_list) and (source == "perception") and ("human_speech" in content_list):
-        name = json_dict["human_speech"]["name"]
-        speech_kr = json_dict["human_speech"]["speech"]
-        info_dict = {}
-        intent = ""
-        response = client.translate_text(
-            parent=parent,
-            contents=[speech_kr],
-            mime_type='text/plain',  # mime types: text/plain, text/html
-            source_language_code='ko',
-            target_language_code='en')
+    try :
+        json_dict = json.loads(data.data)
+        source, target_list, content_list = get_header(json_dict)
+        # 사람 위치 추적 및 이름 파라미터 업데이
+        if ("dialog" in target_list) and (source == "perception") and ("human_speech" in content_list):
+            name = json_dict["human_speech"]["name"]
+            speech_kr = json_dict["human_speech"]["speech"]
+            info_dict = {}
+            intent = ""
+            response = client.translate_text(
+                parent=parent,
+                contents=[speech_kr],
+                mime_type='text/plain',  # mime types: text/plain, text/html
+                source_language_code='ko',
+                target_language_code='en')
 
-        translation = response.translations[0]
-        str_translation = str(translation.translated_text)
-        conv_str_translation = str_translation.replace("n\'t", " not")
-        speech_en = conv_str_translation
-        print(speech_en)
-
-        send_translation(name, speech_kr, speech_en)
+            translation = response.translations[0]
+            str_translation = str(translation.translated_text)
+            conv_str_translation = str_translation.replace("n\'t", " not")
+            speech_en = conv_str_translation
+            print(speech_en)
+        
+            send_translation(name, speech_kr, speech_en)
+    except ValueError : 
+        pass
 
 
 def text_translator():
