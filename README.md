@@ -46,10 +46,11 @@ mv serivce_key.json speech_to_text_converter/service_key/
 google trans api NonType 문제
 
 ```bash
-sudo pip3 uninstall googletrans
-git clone https://github.com/hyeonukbhin/py-googletrans
-cd py-googletrans
-sudo python3 setup.py install
+pip uninstall googletrans
+git clone https://github.com/alainrouillon/py-googletrans.git
+git checkout feature/enhance-use-of-direct-api
+python setup.py install
+
 ```
 
 
