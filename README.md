@@ -8,7 +8,7 @@ ROS 기반 Audio 입출력 Interface
 >>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f
 - Signal Processing
 - Speech to text Converter
-- Text translator
+- Text translator  
 
 ## 1 Framework Structure
 
