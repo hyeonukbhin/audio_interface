@@ -2,13 +2,10 @@ sHRI-Lab : Audio Interface
 ===========================================================
 
 ROS 기반 Audio 입출력 Interface
-<<<<<<< HEAD
 
-=======
->>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f
 - Signal Processing
 - Speech to text Converter
-- Text translator
+- Text translator  
 
 ## 1 Framework Structure
 
@@ -43,6 +40,16 @@ rosrun audio_streamer check_input_device.py
 mv serivce_key.json speech_to_text_converter/service_key/
 ```
 
+google trans api NonType 문제
+
+```bash
+pip uninstall googletrans
+git clone https://github.com/alainrouillon/py-googletrans.git
+git checkout feature/enhance-use-of-direct-api
+python setup.py install
+
+```
+
 
 ## 3. Usage
 --------
@@ -56,8 +63,4 @@ MIC Stream Player
 
 ```bash
 roslaunch bringup_audio_interface bringup_audio_stream_player.launch
-<<<<<<< HEAD
 ```
-=======
-```
->>>>>>> 4d45cd6b73ed3e0c73016071ecfbed2234edc50f

@@ -10,24 +10,18 @@ from termcolor import colored
 
 while True:
     try:
-        translator = Translator(service_urls=[
-            'translate.google.com',
-            'translate.google.co.kr',
-        ])
+        translator = Translator(service_urls=['translate.googleapis.com'])
+
         test_msg_kr = "시작"
         test_msg_en = translator.translate(test_msg_kr, dest='en', src='ko')
         break
 
     except AttributeError as e:
-        # rospy.loginfo("Cannot connect service url")
-        # rospy.loginfo("Reconnecting URL...")
-        print('[{}] {}'.format(time.time(), colored("Cannot Connect Translator Service URL", 'red', attrs=['bold'])))
-        print('[{}] {}'.format(time.time(), colored("Reconnecting Translator Service URL...", 'white', attrs=['bold'])))
-
+        print("Cannot connect service url")
+        print("Reconnecting URL...")
         time.sleep(1)
+
 print('[{}] {}'.format(time.time(), colored("Connected URL!!", 'blue', attrs=['bold'])))
-
-
 
 
 
