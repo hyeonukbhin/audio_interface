@@ -1,5 +1,6 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
+import random
 import json
 import rospy
 from std_msgs.msg import String
@@ -8,7 +9,7 @@ import csv
 from signal import signal, SIGINT
 from sys import exit
 import sys
-
+import time
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -17,6 +18,8 @@ def send_speech(name, speech):
     msgs_dict = {}
     current_time = rospy.get_rostime()
 
+    rospy.set_param("perception/is_speaking_human/data", True)
+    rospy.set_param("perception/is_speaking_human/timestamp", time.time())
     msgs_dict = {
         "header": {
             "timestamp": "%i.%i" % (current_time.secs, current_time.nsecs),
@@ -29,6 +32,9 @@ def send_speech(name, speech):
             "speech": "%s" % speech
         }
     }
+    rospy.sleep(0.5)
+    rospy.set_param("perception/is_speaking_human/data", False)
+    rospy.set_param("perception/is_speaking_human/timestamp", time.time())
 
     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
     pub_recog_topic.publish(json_string)
@@ -55,9 +61,6 @@ def send_sp(name, loc_x, loc_y, loc_z):
     }
     json_string = json.dumps(msgs_dict, ensure_ascii=False, indent=4)
     pub_recog_topic.publish(json_string)
-
-
-import random
 
 
 # def send_dialog(name, intent, info_dict):
@@ -206,8 +209,6 @@ def callback_cmd(user_idx, speed=1):
                      "가끔씩 이런 전환이 필요한것 같아",
                      ]
 
-
-
     speech_user_6 = ["안녕 반가워",
                      "최근에 악기를 배우기 시작했어",
                      "뭘 배울까 고민하다가 기타를 배우기로 결정했어",
@@ -217,8 +218,6 @@ def callback_cmd(user_idx, speed=1):
                      "다른 사람들 앞에서 연주를 하는 것을 목표로 하고 있어",
                      "이게 최근에 가장 재미 있었던 일인것 같아",
                      ]
-
-
 
     if user_idx == 1:
         print("사용자의 이름을 입력해 주세요.")
@@ -353,7 +352,8 @@ def dummy_stt_converter():
 
     rospy.init_node('dummy_stt_converter', anonymous=False)
     # rospy.Subscriber("simulation_trigger", String, callback_cmd)
-    pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
+    pub_recog_topic = rospy.Publisher(
+        "recognitionResult", String, queue_size=100)
     # pub_dialog_topic = rospy.Publisher("dialogResult", String, queue_size=100)
     # pub_task_topic = rospy.Publisher("taskCompletion", String, queue_size=100)
     # pub_recog_topic = rospy.Publisher("recognitionResult", String, queue_size=100)
