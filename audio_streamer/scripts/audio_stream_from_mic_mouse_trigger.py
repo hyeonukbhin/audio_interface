@@ -125,6 +125,13 @@ def main():
                 print("")
                 print("")
                 print("")
+                print("")
+                print("")
+                print("")
+                print("")
+                print("")
+                print("")
+                print("")
                 print("MiC Streaming... {}".format(on_icon))
 
             #     name = "\x1b[1;31m{}\x1b[1;m".format(" ||     ")
