@@ -21,8 +21,8 @@ from signal import signal, SIGINT
 from sys import exit
 import numpy as np
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 # [set path]
 pack_path = rospkg.RosPack().get_path("speech_to_text_converter")
@@ -38,6 +38,12 @@ LOOP_RATE = 5
 
 
 def stt_converter():
+
+    rospy.set_param("perception/human_name/data", "")
+    rospy.set_param("perception/is_speaking_human/data", False)
+    rospy.set_param("perception/is_speaking_human/timestamp", time.time())
+    rospy.set_param("perception/is_speaking_robot/data", False)
+    rospy.set_param("perception/is_speaking_robot/timestamp", time.time())
     language_code = 'ko-KR'  # a BCP-47 language tag
 
     sampling_frequency = int(get_setting_from_launch("sampling_frequency", SAMPLING_FREQUENCY))
@@ -146,7 +152,7 @@ def listen_print_loop(responses):
         else:
             result = str(transcript + overwrite_chars)
             with_spellchecker = get_setting_from_launch("with_spellchecker", WITH_SPELLCHECKER)
-            #print(with_spellchecker)
+            # print(with_spellchecker)
             if with_spellchecker is True:
                 from hanspell import spell_checker
                 checked_result = spell_checker.check(strip_one(result)).as_dict()
