@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import pyaudio
@@ -6,6 +6,7 @@ import rospy
 from audio_msgs.msg import AudioData
 import numpy as np
 from termcolor import colored
+import noisereduce as nr
 
 CHANNELS = 1
 SAMPLING_FREQUENCY = 44100
@@ -25,6 +26,7 @@ def main():
     loop_rate = int(get_setting_from_launch("loop_rate", LOOP_RATE))
     # pcm_format = get_setting_from_launch("pcm_format", PCM_FORMAT)
     chunk = int(sampling_frequency / loop_rate)  # 100ms
+    # chunk = 4096  # 100ms
 
     audio_interface = pyaudio.PyAudio()
     # pa_format = get_pa_format(pcm_format)
@@ -44,13 +46,21 @@ def main():
         try:
             byte_buff = stream.read(chunk)
             int16_buff = np.fromstring(byte_buff, dtype=np.int16)
+            sound_level = (20 / 100.)
+            int16_buff = int16_buff * sound_level
+            int16_buff = int16_buff.astype(np.int16)
+            # int16_buff = np.fromstring(byte_buff, dtype=np.int16) / 1.0
+            reduced_int16_buff = nr.reduce_noise(int16_buff, sr=SAMPLING_FREQUENCY)
 
             audio_stream.header.seq = msg_sequence
             audio_stream.header.frame_id = DEVICE_NAME
             audio_stream.header.stamp = rospy.Time.now()
-            audio_stream.data = int16_buff
+            audio_stream.data = reduced_int16_buff
             msg_sequence += 1
             scan_pub.publish(audio_stream)
+
+            reduced_byte_buff = reduced_int16_buff.astype(np.int16).tobytes()
+            stream.write(reduced_byte_buff)
 
         except IOError as e:
             stream.close()

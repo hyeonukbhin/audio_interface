@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import pyaudio
@@ -6,6 +6,9 @@ import rospy
 from audio_msgs.msg import AudioData
 import numpy as np
 from termcolor import colored
+from pynput import mouse, keyboard
+import noisereduce as nr
+
 
 CHANNELS = 1
 SAMPLING_FREQUENCY = 44100
@@ -13,11 +16,55 @@ LOOP_RATE = 5
 # PCM_FORMAT = "int16"
 DEVICE_NAME = "USB Audio Device"
 OUTPUT_PLAY = False
+key_state = "released"
+
+C_BOLD = "\033[1m"
+C_GREEN = "\033[32m"
+C_RED = "\033[31m"
+C_END = "\033[0m"
+# ○ ●
+
+off_icon = C_BOLD + C_RED + "○" + C_END
+on_icon = C_BOLD + C_GREEN + "●" + C_END
+
+
+def on_click(x, y, button, pressed):
+    global key_state
+    # print("Pressed")
+    key_state = "pressed"
+    # if button == mouse.Button.left:
+    # return False
+
+    if not pressed:
+        # print("Released")
+        key_state = "released"
+        # return False
+
+
+def on_press(key):
+    global key_state
+    if str(key) == "Key.page_down" or str(key) == "Key.page_up":
+        # print(key)
+        key_state = "pressed"
+
+
+def on_release(key):
+    global key_state
+    # print("Pressed")
+    key_state = "released"
 
 
 def main():
     rospy.init_node('audio_streamer')
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=100)
+
+    audio_streamer_conf = {
+        "mic_volume": 100,
+        "playback_sound": False,
+        "noise_reduce": False,
+        "key_control": False
+    }
+    rospy.set_param("/audio_streamer/conf", audio_streamer_conf)
 
     device_name = get_setting_from_launch("device_name", DEVICE_NAME)
     channels = int(get_setting_from_launch("channels", CHANNELS))
@@ -25,7 +72,6 @@ def main():
     loop_rate = int(get_setting_from_launch("loop_rate", LOOP_RATE))
     # pcm_format = get_setting_from_launch("pcm_format", PCM_FORMAT)
     chunk = int(sampling_frequency / loop_rate)  # 100ms
-
     audio_interface = pyaudio.PyAudio()
     # pa_format = get_pa_format(pcm_format)
     dvc_idx = get_device_idx(audio_interface, device_name)
@@ -40,28 +86,56 @@ def main():
     stream = make_stream(audio_interface, pyaudio.paInt16, dvc_idx, channels, sampling_frequency, chunk)
     msg_sequence = 0
     audio_stream = AudioData()
+    listener2 = keyboard.Listener(on_press=on_press, on_release=on_release)
+
+    # listener1.start()
+    listener2.start()
     while not rospy.is_shutdown():
         try:
             byte_buff = stream.read(chunk)
             int16_buff = np.fromstring(byte_buff, dtype=np.int16)
+
+            audio_conf = rospy.get_param("/audio_streamer/conf")
+
+            sound_level = (int(audio_conf['mic_volume']) / 100.)
+            int16_buff = int16_buff * sound_level
+            int16_buff = int16_buff.astype(np.int16)
+
+            if audio_conf["noise_reduce"] is True:
+                int16_buff = nr.reduce_noise(int16_buff, sr=SAMPLING_FREQUENCY)
 
             audio_stream.header.seq = msg_sequence
             audio_stream.header.frame_id = DEVICE_NAME
             audio_stream.header.stamp = rospy.Time.now()
             audio_stream.data = int16_buff
             msg_sequence += 1
-            scan_pub.publish(audio_stream)
+            # scan_pub.publish(audio_stream)
+
+            if audio_conf["key_control"] is True:
+                if key_state == "pressed":
+                    print("\n" * 40)
+                    print("MiC Streaming... {}".format(on_icon))
+                    scan_pub.publish(audio_stream)
+                    if audio_conf["playback_sound"] is True:
+                        playback_buff = int16_buff.astype(np.int16).tobytes()
+                        stream.write(playback_buff)
+
+                else:
+                    pass
+                    print("\n" * 40)
+                    print("MiC Off          {}".format(off_icon))
+            else:
+                scan_pub.publish(audio_stream)
+
+                if audio_conf["playback_sound"] is True:
+                    playback_buff = int16_buff.astype(np.int16).tobytes()
+                    stream.write(playback_buff)
 
         except IOError as e:
             stream.close()
             stream = make_stream(audio_interface, pyaudio.paInt16, dvc_idx, channels, sampling_frequency, chunk)
 
         r.sleep()
-
-# def play_audio(myarray):
-#     sd.default.samplerate = 44100
-#     # sd.default.device =
-#     sd.play(myarray)
 
 
 def make_stream(audio_interface, format, input_device_index, channels, rate, frames_per_buffer, input=True, output=True):
