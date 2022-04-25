@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#!/usr/local/bin/python3.6
 # -*- coding: utf-8 -*-
 
 import pyaudio
@@ -59,11 +59,11 @@ def main():
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=100)
 
     audio_streamer_conf = {
-        "mic_volume": 50,
+        "mic_volume": 30,
         "playback_sound": False,
-        "noise_reduce": False,
+        "noise_reduce": True,
         "key_control": True,
-        "off_volume": 1.,
+        "off_volume": 0.,
         "last_on_time": 0.
     }
     rospy.set_param("/audio_streamer/conf", audio_streamer_conf)
