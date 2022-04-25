@@ -96,43 +96,24 @@ def main():
         try:
             byte_buff = stream.read(chunk)
             int16_buff = np.fromstring(byte_buff, dtype=np.int16)
+            try:
+                audio_conf = rospy.get_param("/audio_streamer/conf")
 
-            audio_conf = rospy.get_param("/audio_streamer/conf")
+                sound_level = (int(audio_conf['mic_volume']) / 100.)
+                int16_buff = int16_buff * sound_level
+                int16_buff = int16_buff.astype(np.int16)
 
-            sound_level = (int(audio_conf['mic_volume']) / 100.)
-            int16_buff = int16_buff * sound_level
-            int16_buff = int16_buff.astype(np.int16)
+                if audio_conf["noise_reduce"] is True:
+                    int16_buff = nr.reduce_noise(int16_buff, sr=SAMPLING_FREQUENCY)
 
-            if audio_conf["noise_reduce"] is True:
-                int16_buff = nr.reduce_noise(int16_buff, sr=SAMPLING_FREQUENCY)
+                audio_stream.header.seq = msg_sequence
+                audio_stream.header.frame_id = DEVICE_NAME
+                audio_stream.header.stamp = rospy.Time.now()
+                msg_sequence += 1
+                # scan_pub.publish(audio_stream)
 
-            audio_stream.header.seq = msg_sequence
-            audio_stream.header.frame_id = DEVICE_NAME
-            audio_stream.header.stamp = rospy.Time.now()
-            msg_sequence += 1
-            # scan_pub.publish(audio_stream)
-
-            if audio_conf["key_control"] is True:
-                if key_state == "pressed":
-                    sound_level = (int(audio_conf['mic_volume']) / 100.)
-                    int16_buff = int16_buff * sound_level
-                    int16_buff = int16_buff.astype(np.int16)
-
-                    print("\n" * 40)
-                    print("MiC Streaming... {}".format(on_icon))
-                    audio_stream.data = int16_buff
-
-                    scan_pub.publish(audio_stream)
-                    if audio_conf["playback_sound"] is True:
-                        playback_buff = int16_buff.astype(np.int16).tobytes()
-                        stream.write(playback_buff)
-
-                    # mem_key_control = True
-                    rospy.set_param("/audio_streamer/conf/last_on_time", time.time())
-
-                else:
-                    last_on_time = rospy.get_param("/audio_streamer/conf/last_on_time", time.time())
-                    if float(time.time()) - float(last_on_time) < 2.:
+                if audio_conf["key_control"] is True:
+                    if key_state == "pressed":
                         sound_level = (int(audio_conf['mic_volume']) / 100.)
                         int16_buff = int16_buff * sound_level
                         int16_buff = int16_buff.astype(np.int16)
@@ -145,30 +126,51 @@ def main():
                         if audio_conf["playback_sound"] is True:
                             playback_buff = int16_buff.astype(np.int16).tobytes()
                             stream.write(playback_buff)
+
+                        # mem_key_control = True
+                        rospy.set_param("/audio_streamer/conf/last_on_time", time.time())
+
                     else:
+                        last_on_time = rospy.get_param("/audio_streamer/conf/last_on_time", time.time())
+                        if float(time.time()) - float(last_on_time) < 2.:
+                            sound_level = (int(audio_conf['mic_volume']) / 100.)
+                            int16_buff = int16_buff * sound_level
+                            int16_buff = int16_buff.astype(np.int16)
 
-                        sound_level = (audio_conf['off_volume'] / 100.)
-                        int16_buff = int16_buff * sound_level
-                        int16_buff = int16_buff.astype(np.int16)
-
-                        if audio_conf['off_volume'] != 0:
+                            print("\n" * 40)
+                            print("MiC Streaming... {}".format(on_icon))
                             audio_stream.data = int16_buff
 
+                            scan_pub.publish(audio_stream)
+                            if audio_conf["playback_sound"] is True:
+                                playback_buff = int16_buff.astype(np.int16).tobytes()
+                                stream.write(playback_buff)
                         else:
-                            audio_stream.data = [0] * 8820
 
-                        print("\n" * 40)
-                        print("MiC Off          {}".format(off_icon))
+                            sound_level = (audio_conf['off_volume'] / 100.)
+                            int16_buff = int16_buff * sound_level
+                            int16_buff = int16_buff.astype(np.int16)
 
+                            if audio_conf['off_volume'] != 0:
+                                audio_stream.data = int16_buff
+
+                            else:
+                                audio_stream.data = [0] * 8820
+
+                            print("\n" * 40)
+                            print("MiC Off          {}".format(off_icon))
+
+                        scan_pub.publish(audio_stream)
+
+                else:
+                    audio_stream.data = int16_buff
                     scan_pub.publish(audio_stream)
 
-            else:
-                audio_stream.data = int16_buff
-                scan_pub.publish(audio_stream)
-
-                if audio_conf["playback_sound"] is True:
-                    playback_buff = int16_buff.astype(np.int16).tobytes()
-                    stream.write(playback_buff)
+                    if audio_conf["playback_sound"] is True:
+                        playback_buff = int16_buff.astype(np.int16).tobytes()
+                        stream.write(playback_buff)
+            except KeyError as e:
+                rospy.set_param("/audio_streamer/conf", audio_streamer_conf)
 
         except IOError as e:
             stream.close()
