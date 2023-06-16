@@ -29,6 +29,8 @@ class AudioStreamPlayer:
         int16_buff = np.array(self.play_buff, dtype='int16')
         play_audio(int16_buff, self.sampling_frequency)
 
+
+
 # audio = pyaudio.PyAudio()
 # stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True, frames_per_buffer=CHUNK)
 

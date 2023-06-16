@@ -61,8 +61,8 @@ def main():
     audio_streamer_conf = {
         "mic_volume": 30,
         "playback_sound": False,
-        "noise_reduce": True,
-        "key_control": True,
+        "noise_reduce": False,
+        "key_control": False,
         "off_volume": 0.,
         "last_on_time": 0.
     }

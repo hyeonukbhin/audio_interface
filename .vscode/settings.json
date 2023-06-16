@@ -1,0 +1,16 @@
+{
+	"python.autoComplete.extraPaths": [
+		"/home/kist/bci_ws/devel/lib/python3/dist-packages",
+		"/home/kist/catkin_ws/devel/lib/python3/dist-packages",
+		"/opt/ros/noetic/lib/python3/dist-packages"
+	],
+	"python.analysis.extraPaths": [
+		"/home/kist/bci_ws/devel/lib/python3/dist-packages",
+		"/home/kist/catkin_ws/devel/lib/python3/dist-packages",
+		"/opt/ros/noetic/lib/python3/dist-packages"
+	],
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.autopep8"
+	},
+	"python.formatting.provider": "none"
+}
