@@ -17,7 +17,8 @@ class AudioStreamPlayer:
         rospy.Subscriber("audio_stream", AudioData, self.cb_audio_stream, queue_size=50)
         self.play_buff = []
         self.sampling_frequency = int(get_setting_from_launch("sampling_frequency", SAMPLING_FREQUENCY))
-        self.play_overlap_chunk = int(get_setting_from_launch("play_overlap_chunk", PLAY_OVERLAP_CHUNK))
+        # self.play_overlap_chunk = int(get_setting_from_launch("play_overlap_chunk", PLAY_OVERLAP_CHUNK))
+        self.play_overlap_chunk = int(self.sampling_frequency / 5)  # 100ms
         channels = 1
         # pcm_format = get_setting_from_launch("pcm_format", PCM_FORMAT)
         audio_interface = pyaudio.PyAudio()

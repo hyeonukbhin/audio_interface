@@ -1,0 +1,17 @@
+<launch>
+    <arg name="device_name" default="USB Device"/>
+    <arg name="channels" default="1"/>
+    <arg name="sampling_frequency" default="48000"/>
+    <arg name="loop_rate" default="5"/>
+
+	<node name="audio_stream_player_minibot" pkg="audio_streamer" type="audio_stream_player_v2.py" output="screen">
+        <param name="sampling_frequency" value="48000"/>
+        <param name="play_overlap_chunk" value="10000"/>
+        <remap from="audio_stream" to="audio_stream_minibot"/>
+
+	</node>
+
+
+</launch>
+
+
