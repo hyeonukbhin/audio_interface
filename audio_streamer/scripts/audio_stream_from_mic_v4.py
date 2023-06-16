@@ -59,7 +59,7 @@ def main():
     scan_pub = rospy.Publisher('audio_stream', AudioData, queue_size=100)
 
     audio_streamer_conf = {
-        "mic_volume": 30,
+        "mic_volume": 60,
         "playback_sound": False,
         "noise_reduce": False,
         "key_control": False,

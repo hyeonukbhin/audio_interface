@@ -1,0 +1,25 @@
+<launch>
+    <arg name="device_name" default="USB Device"/>
+    <arg name="channels" default="1"/>
+    <arg name="sampling_frequency" default="48000"/>
+    <arg name="loop_rate" default="5"/>
+
+	<node name="audio_streamer_minibot" pkg="audio_streamer" type="audio_stream_from_mic_v4.py" output="screen">
+		<param name="device_name" value="$(arg device_name)"/>
+        <param name="channels" value="$(arg channels)"/>
+        <param name="sampling_frequency" value="$(arg sampling_frequency)"/>
+        <param name="loop_rate" value="$(arg loop_rate)"/>
+        <remap from="audio_stream" to="audio_stream_minibot"/>
+	</node>
+
+	<node name="audio_stream_player_remote" pkg="audio_streamer" type="audio_stream_player_v2.py" output="screen">
+        <param name="sampling_frequency" value="44100"/>
+        <param name="play_overlap_chunk" value="10000"/>
+        <remap from="audio_stream" to="audio_stream_remote"/>
+
+	</node>
+
+
+</launch>
+
+
